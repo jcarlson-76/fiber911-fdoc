@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F2A5C">
+<title>Fiber911 · Panel Guide</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<style>
+:root{
+  --navy:#1F2A5C; --navy2:#2E3E7E; --cyan:#00AEEF; --red:#C8102E;
+  --light:#E8ECF5; --line:#C9D0E3; --ink:#1b1f2e; --mute:#5d6680; --bg:#F5F7FB;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;padding:calc(env(safe-area-inset-top) + 10px) 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:3px solid var(--red)}
+.badge{width:38px;height:38px;border-radius:50%;background:#fff;color:var(--red);display:grid;place-items:center;font-weight:900;font-size:13px;letter-spacing:-.5px;flex:none}
+.brand{font-weight:800;font-size:17px;line-height:1.1}
+.brand small{display:block;font-weight:500;font-size:11px;color:#b9c3e6}
+.grow{flex:1}
+.iconbtn{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.chip{font-size:11px;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.14);white-space:nowrap}
+.chip.ok{background:#1e7f4f}.chip.warn{background:#b7791f}.chip.err{background:var(--red)}
+main{max-width:1100px;margin:0 auto;padding:14px 14px 100px}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.tile b{display:block;font-size:24px;color:var(--navy)}
+.tile span{font-size:11px;font-weight:700;color:var(--mute);text-transform:uppercase;letter-spacing:.4px}
+.tile.red b{color:var(--red)}
+@media(max-width:600px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.search{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;margin-bottom:12px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;cursor:pointer;display:flex;gap:12px;align-items:center}
+.card:hover{border-color:var(--cyan)}
+.card h3{margin:0;font-size:16px;color:var(--navy)}
+.card p{margin:2px 0 0;font-size:13px;color:var(--mute)}
+.util{width:64px;text-align:right;font-weight:800;color:var(--navy)}
+.util small{display:block;font-weight:600;font-size:10px;color:var(--mute)}
+.bar{height:6px;border-radius:3px;background:var(--light);overflow:hidden;display:flex;margin-top:6px}
+.bar i{display:block;height:100%}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));background:var(--cyan);color:#fff;border:0;border-radius:99px;padding:14px 20px;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.2);cursor:pointer;z-index:15}
+.empty{text-align:center;color:var(--mute);padding:40px 10px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:600}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.cyan{background:var(--cyan);border-color:var(--cyan);color:#fff}
+.btn.danger{color:var(--red);border-color:#f0b7c0}
+.btn:disabled{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.sect{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px}
+.sect h2{margin:0 0 10px;font-size:13px;color:var(--navy);text-transform:uppercase;letter-spacing:.5px}
+.fields{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.fields label{display:flex;flex-direction:column;font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
+.fields input,.fields textarea{margin-top:3px;padding:8px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:14px;font-weight:400;text-transform:none;letter-spacing:0}
+.fields .span2{grid-column:span 2}.fields .span4{grid-column:1/-1}
+@media(max-width:700px){.fields{grid-template-columns:repeat(2,1fr)}.fields .span4,.fields .span2{grid-column:1/-1}}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px}
+.tab{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;cursor:pointer;white-space:nowrap;font-weight:600}
+.tab.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.mod{border:2px solid var(--navy);border-radius:10px;overflow:hidden;margin-bottom:12px;background:#fff}
+.modhead{display:flex;align-items:center;background:var(--navy);color:#fff}
+.modhead b{padding:8px 12px;white-space:nowrap;font-size:13px}
+.modhead span{font-size:12px;font-weight:700;padding-right:6px}
+.modhead input{flex:1;min-width:0;border:0;padding:9px 10px;background:#fff;color:var(--ink)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.grid{border-collapse:collapse;width:100%;min-width:860px;table-layout:fixed}
+table.grid th,table.grid td{border:1px solid var(--line);padding:0;height:34px;text-align:center}
+table.grid th.lab{width:96px;background:var(--light);color:var(--navy);font-size:10px;font-weight:800;text-align:left;padding-left:8px;position:sticky;left:0;z-index:2;text-transform:uppercase}
+table.grid td input,table.grid td select{width:100%;height:100%;border:0;background:transparent;text-align:center;font-size:13px;padding:0 2px;min-width:0}
+table.grid td select{font-size:10.5px;font-weight:800;appearance:none;-webkit-appearance:none;cursor:pointer}
+table.grid td input:focus,table.grid td select:focus{outline:2px solid var(--cyan);outline-offset:-2px;background:#f2fbff}
+th.port{font-weight:800;font-size:14px}
+.st-ACTIVE{background:#C6EFCE;color:#006100}.st-SPARE{background:#DDEBF7;color:#1F4E78}
+.st-DARK{background:#D9D9D9;color:#404040}.st-RESERVED{background:#FFEB9C;color:#7F6000}
+.st-DAMAGED{background:#FFC7CE;color:#9C0006}
+.lowlight{color:var(--red);font-weight:800}
+.legend{display:flex;flex-wrap:wrap;gap:6px;font-size:11px;margin:4px 0 12px}
+.legend span{padding:3px 8px;border-radius:5px;font-weight:700}
+dialog{border:0;border-radius:14px;padding:0;width:min(520px,94vw);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(15,20,45,.55)}
+.dlg{padding:18px}
+.dlg h2{margin:0 0 12px;color:var(--navy);font-size:18px}
+.dlg .fields{grid-template-columns:1fr}
+.dlg .fields label{margin-bottom:4px}
+.note{font-size:12px;color:var(--mute)}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:#fff;padding:9px 16px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+.toast.show{opacity:1}
+table.dash{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+table.dash th{background:var(--navy);color:#fff;font-size:10px;text-transform:uppercase;padding:7px 6px}
+table.dash td{border-bottom:1px solid var(--line);padding:7px 6px;text-align:center}
+table.dash td:first-child{text-align:left;font-weight:700;color:var(--navy)}
+.printonly{display:none}
+.map{height:260px;border-radius:10px;border:1px solid var(--line);z-index:1}
+.bigmap{height:calc(100vh - 260px);min-height:360px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:12px}
+.seg button{border:0;background:#fff;padding:7px 16px;font-weight:700;cursor:pointer}
+.seg button.on{background:var(--navy);color:#fff}
+.atts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.att{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.att .thumb{height:110px;background:var(--light);display:grid;place-items:center;font-weight:900;color:var(--navy);font-size:20px;cursor:pointer;background-size:cover;background-position:center}
+.att .meta{padding:6px 8px;font-size:11px;line-height:1.3}
+.att .meta b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.att .cat{display:inline-block;font-size:9px;font-weight:800;padding:1px 6px;border-radius:4px;background:var(--light);color:var(--navy);text-transform:uppercase}
+.att .acts{display:flex;border-top:1px solid var(--line)}
+.att .acts button{flex:1;border:0;background:#fff;padding:6px;font-size:12px;cursor:pointer}
+.att .acts button+button{border-left:1px solid var(--line);color:var(--red)}
+.pending{color:#b7791f;font-weight:700}
+.upl{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.dlgsub{font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--navy);margin:16px 0 8px;border-top:1px solid var(--line);padding-top:12px}
+.pickrow{display:flex;align-items:center;gap:10px;margin:8px 0}
+.pickrow>span{width:130px;font-size:11px;font-weight:800;color:var(--navy);text-transform:uppercase}
+.pick{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.pick label{cursor:pointer}
+.pick input{position:absolute;opacity:0;pointer-events:none}
+.pick b{display:block;padding:9px 16px;font-size:14px;background:#fff}
+.pick label+label b{border-left:1px solid var(--line)}
+.pick input:checked+b{background:var(--navy);color:#fff}
+.modhead .x{background:transparent;border:0;color:#fff;font-size:18px;padding:0 12px;cursor:pointer;align-self:stretch}
+.modhead .x:hover{background:var(--red)}
+.upl select{padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
+@media print{
+  @page{size:letter portrait;margin:.4in}
+  body{background:#fff}
+  header.top,.fab,.noprint,.tabs,.toast,dialog{display:none!important}
+  main{padding:0;max-width:none}
+  .sect{border:0;padding:0;margin-bottom:6px}
+  .printonly{display:block}
+  .scroll{overflow:visible}
+  table.grid{min-width:0}
+  table.grid th,table.grid td{height:22px}
+  table.grid td input,table.grid td select{font-size:9px}
+  .mod{break-inside:avoid;margin-bottom:6px}
+  .fields input{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:2px 0}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="badge">911</div>
+  <div class="brand">Panel Guide<small>Fiber911 · Precision Networks</small></div>
+  <div class="grow"></div>
+  <span id="syncChip" class="chip">Local</span>
+  <a href="https://locates.fiber911.com/" class="iconbtn noprint" style="text-decoration:none">Locates</a>
+  <button class="iconbtn" id="btnSettings" title="Settings">⚙</button>
+</header>
+<main id="app"></main>
+<button class="fab noprint" id="fab">+ Location</button>
+<div class="toast" id="toast"></div>
+
+<dialog id="dlgLoc"><form method="dialog" class="dlg" id="formLoc">
+  <h2>New location</h2>
+  <div class="fields">
+    <label>Location name *<input name="name" required placeholder="e.g. Fire Station 8"></label>
+    <label>Address<input name="address" placeholder="Street, City"></label>
+  </div>
+  <h3 class="dlgsub">First terminal (port plate) — Terminal A</h3>
+  <div class="pickrow"><span>Ports</span><div class="pick"><label><input type="radio" name="count" value="12" checked><b>12 ports</b></label><label><input type="radio" name="count" value="24"><b>24 ports</b></label></div></div>
+    <div class="pickrow"><span>Connector</span><div class="pick"><label><input type="radio" name="conn" value="LC" checked><b>LC</b></label><label><input type="radio" name="conn" value="SC"><b>SC</b></label></div></div>
+  <div class="pickrow"><span>How many like this</span><input name="qty" type="number" min="1" max="26" value="1" style="width:80px;padding:8px;border:1px solid var(--line);border-radius:8px"></div>
+  <p class="note">Terminals are lettered A, B, C… You can add more terminals with different sizes after you create the location.</p>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    <button class="btn" value="cancel" formnovalidate>Cancel</button>
+    <button class="btn primary" value="ok">Create</button>
+  </div>
+</form></dialog>
+
+<dialog id="dlgTerm"><form method="dialog" class="dlg" id="formTerm">
+  <h2 id="termTitle">Add terminal</h2>
+  <div class="fields"><label>Terminal letter / name<input name="letter" required maxlength="12"></label></div>
+  <div class="pickrow"><span>Ports</span><div class="pick"><label><input type="radio" name="tcount" value="12" checked><b>12 ports</b></label><label><input type="radio" name="tcount" value="24"><b>24 ports</b></label></div></div>
+    <div class="pickrow"><span>Connector</span><div class="pick"><label><input type="radio" name="tconn" value="LC" checked><b>LC</b></label><label><input type="radio" name="tconn" value="SC"><b>SC</b></label></div></div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    <button class="btn" value="cancel" formnovalidate>Cancel</button>
+    <button class="btn primary" value="ok">Add</button>
+  </div>
+</form></dialog>
+
+<dialog id="dlgSettings"><div class="dlg">
+  <h2>Settings &amp; sync</h2>
+  <div class="fields">
+    <label>Apps Script web app URL<input id="setUrl" placeholder="https://script.google.com/macros/s/…/exec"></label>
+    <label>Sync key<input id="setKey" placeholder="from the Setup step in the Sheet"></label>
+    <label>Tech name (default for new panels)<input id="setTech"></label>
+    <label>Low-light threshold (dBm)<input id="setLow" type="number" step="0.1"></label>
+  </div>
+  <p class="note">Data is saved on this device first, then synced to the shared Google Sheet. Each location becomes its own tab in the Sheet.</p>
+  <div class="row" style="margin-top:8px">
+    <button class="btn cyan" id="btnSyncNow">Sync now</button>
+    <button class="btn" id="btnOpenSheet">Open Sheet</button>
+    <button class="btn" id="btnExport">Backup (JSON)</button>
+    <label class="btn" style="margin:0">Restore<input type="file" id="fileImport" accept=".json" hidden></label>
+  </div>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    <button class="btn primary" id="btnSaveSettings">Save</button>
+  </div>
+</div></dialog>
+
+<script>
+"use strict";
+/* ================= constants ================= */
+const STATUSES = ["ACTIVE","SPARE","DARK","RESERVED","DAMAGED"];
+const ST_COLORS = {ACTIVE:"#22a05a",SPARE:"#4a86c5",DARK:"#8c8c8c",RESERVED:"#d9a400",DAMAGED:"#C8102E"};
+const TIA = [["BL","#0070C0","#fff"],["OR","#F79646","#000"],["GR","#00A651","#fff"],["BR","#8B5A2B","#fff"],
+  ["SL","#808080","#fff"],["WH","#FFFFFF","#000"],["RD","#E00000","#fff"],["BK","#000000","#fff"],
+  ["YL","#FFE600","#000"],["VI","#7030A0","#fff"],["RS","#F4A6C0","#000"],["AQ","#33CCCC","#000"]];
+const LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+/* ================= IndexedDB ================= */
+const DB = (() => {
+  let dbp;
+  function open(){
+    if (dbp) return dbp;
+    dbp = new Promise((res, rej) => {
+      const r = indexedDB.open("fiber911-panels", 1);
+      r.onupgradeneeded = () => {
+        const d = r.result;
+        d.createObjectStore("locations", {keyPath:"id"});
+        d.createObjectStore("meta");
+        d.createObjectStore("files", {keyPath:"id"});
+      };
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+    return dbp;
+  }
+  async function tx(store, mode, fn){
+    const d = await open();
+    return new Promise((res, rej) => {
+      const t = d.transaction(store, mode);
+      const s = t.objectStore(store);
+      let out;
+      Promise.resolve(fn(s)).then(v => out = v);
+      t.oncomplete = () => res(out);
+      t.onerror = () => rej(t.error);
+    });
+  }
+  const req = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  return {
+    all: () => tx("locations","readonly", s => req(s.getAll())),
+    put: v => tx("locations","readwrite", s => { s.put(v); }),
+    del: id => tx("locations","readwrite", s => { s.delete(id); }),
+    getMeta: k => tx("meta","readonly", s => req(s.get(k))),
+    setMeta: (k, v) => tx("meta","readwrite", s => { s.put(v, k); }),
+    getFile: id => tx("files","readonly", s => req(s.get(id))),
+    putFile: v => tx("files","readwrite", s => { s.put(v); }),
+    delFile: id => tx("files","readwrite", s => { s.delete(id); }),
+  };
+})();
+
+/* ================= model ================= */
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const now = () => new Date().toISOString();
+const blankPort = () => ({s:"",p:"",l:"",d:""});
+function newModule(i, count = 12, conn = "LC"){
+  return {letter: LETTERS[i] || String(i+1), to:"", count, conn, ports: Array.from({length:count}, blankPort), circuits: Array(count / 2).fill("")};
+}
+function resizeModule(m, count){
+  while (m.ports.length < count) m.ports.push(blankPort());
+  m.ports.length = count;
+  while (m.circuits.length < count / 2) m.circuits.push("");
+  m.circuits.length = count / 2;
+  m.count = count;
+}
+const portTotal = p => p.modules.reduce((a, m) => a + m.ports.length, 0);
+function newPanel(n, qty = 1, count = 12, conn = "LC"){
+  return {id: uid(), name: "Panel " + n, systemId:"", module:"", datt:"", type:"",
+    date: new Date().toISOString().slice(0,10), tech: settings.tech || "", modules: Array.from({length: qty}, (_, i) => newModule(i, count, conn))};
+}
+function newLocation(name, address, qty, count, conn){
+  return {id: uid(), name, address: address || "", notes:"", lat:"", lng:"", panels:[newPanel(1, qty, count, conn)], attachments:[], updatedAt: now(), dirty: true};
+}
+const nextLetter = p => LETTERS.split("").find(c => !p.modules.some(m => m.letter === c)) || String(p.modules.length + 1);
+const CATS = {photo:"Panel photo", otdr:"OTDR trace", gis:"GIS map", pdf:"Document"};
+function guessCat(f){
+  const n = f.name.toLowerCase();
+  if (/\.(sor|trc|msor|olts?)$/.test(n) || /otdr/.test(n)) return "otdr";
+  if (/gis|map|\.kmz$|\.kml$/.test(n)) return "gis";
+  if (f.type.startsWith("image/")) return "photo";
+  return "pdf";
+}
+const extOf = n => (n.split(".").pop() || "file").slice(0, 4).toUpperCase();
+const fmtSize = b => b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+async function shrinkImage(file, max = 1800, q = .82){
+  if (!file.type.startsWith("image/") || /gif|svg/.test(file.type)) return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    if (k === 1 && file.size < 1.5e6) return file;
+    const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+    c.getContext("2d").drawImage(bmp, 0, 0, c.width, c.height);
+    const blob = await new Promise(r => c.toBlob(r, "image/jpeg", q));
+    return new File([blob], file.name.replace(/\.\w+$/, "") + ".jpg", {type:"image/jpeg"});
+  } catch { return file; }
+}
+const blobToB64 = b => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result).split(",")[1]); r.onerror = rej; r.readAsDataURL(b); });
+const thumbUrls = new Map();
+function statsOf(loc){
+  const st = {ACTIVE:0,SPARE:0,DARK:0,RESERVED:0,DAMAGED:0,OPEN:0,total:0,low:0,levels:[]};
+  for (const p of loc.panels || []) for (const m of p.modules) for (const pt of m.ports){
+    st.total++;
+    const s = (pt.s || "").toUpperCase();
+    if (STATUSES.includes(s)) st[s]++; else st.OPEN++;
+    const lv = parseFloat(pt.l);
+    if (!isNaN(lv)) { st.levels.push(lv); if (lv < settings.low) st.low++; }
+  }
+  st.inUse = st.ACTIVE + st.RESERVED;
+  st.util = st.total ? st.inUse / st.total : 0;
+  return st;
+}
+
+/* ================= state ================= */
+let locations = [];
+let settings = {url:"", key:"", tech:"", low:-25};
+let route = {view:"home"};
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200); }
+
+/* ================= rendering ================= */
+function render(){
+  $("#fab").style.display = route.view === "home" ? "" : "none";
+  if (route.view === "loc") {
+    const loc = locations.find(l => l.id === route.id && !l.deleted);
+    if (!loc) { route = {view:"home"}; return render(); }
+    renderLocation(loc);
+  } else renderHome();
+}
+
+function statBar(st){
+  if (!st.total) return "";
+  return `<div class="bar">${STATUSES.map(s => st[s] ? `<i style="width:${st[s]/st.total*100}%;background:${ST_COLORS[s]}"></i>` : "").join("")}</div>`;
+}
+
+let homeMap = null, locMap = null;
+function killMaps(){ if (homeMap) { homeMap.remove(); homeMap = null; } if (locMap) { locMap.remove(); locMap = null; } }
+const hasGeo = l => l.lat !== "" && l.lng !== "" && !isNaN(parseFloat(l.lat)) && !isNaN(parseFloat(l.lng));
+const tiles = () => L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:"© OpenStreetMap"});
+const pinIcon = color => L.divIcon({className:"", iconSize:[22,22], iconAnchor:[11,11],
+  html:`<div style="width:22px;height:22px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>`});
+
+function renderHome(){
+  killMaps();
+  const live = locations.filter(l => !l.deleted).sort((a,b) => a.name.localeCompare(b.name));
+  const tot = {loc: live.length, panels:0, inUse:0, total:0, dmg:0, low:0, files:0};
+  const rows = live.map(l => { const st = statsOf(l); tot.panels += l.panels.length; tot.inUse += st.inUse; tot.total += st.total; tot.dmg += st.DAMAGED; tot.low += st.low; tot.files += (l.attachments || []).length; return [l, st]; });
+  const q = (route.q || "").toLowerCase();
+  const shown = rows.filter(([l]) => !q || (l.name + " " + l.address + " " + l.panels.map(p => p.systemId).join(" ")).toLowerCase().includes(q));
+  const mode = route.mode || "list";
+  $("#app").innerHTML = `
+    <div class="tiles">
+      <div class="tile"><b>${tot.loc}</b><span>Locations · ${tot.panels} panels</span></div>
+      <div class="tile"><b>${tot.total}</b><span>Ports</span></div>
+      <div class="tile"><b>${tot.total ? Math.round(tot.inUse / tot.total * 100) : 0}%</b><span>${tot.inUse} ports in use</span></div>
+      <div class="tile red"><b>${tot.dmg}</b><span>Damaged · ${tot.low} low light</span></div>
+    </div>
+    <div class="row noprint" style="align-items:flex-start">
+      <div class="seg"><button data-mode="list" class="${mode === "list" ? "on" : ""}">List</button><button data-mode="map" class="${mode === "map" ? "on" : ""}">Map</button></div>
+      <input class="search grow" id="q" placeholder="Search locations, addresses, system IDs…" value="${esc(route.q || "")}">
+    </div>
+    ${mode === "map" ? `<div id="homeMap" class="map bigmap"></div><p class="note">${shown.filter(([l]) => hasGeo(l)).length} of ${shown.length} locations have a GPS pin. Red = has damaged ports.</p>` : `
+    <div class="legend">${STATUSES.map(s => `<span class="st-${s}">${s}</span>`).join("")}<span style="background:#eee;color:#555">OPEN = no status</span></div>
+    <div id="list">${shown.length ? shown.map(([l, st]) => `
+      <div class="card" data-id="${l.id}">
+        <div class="grow">
+          <h3>${esc(l.name)}</h3>
+          <p>${esc(l.address || "No address")} · ${l.panels.length} panel${l.panels.length === 1 ? "" : "s"} · ${st.total} ports${(l.attachments || []).length ? ` · ${(l.attachments).length} file(s)` : ""}${st.DAMAGED ? ` · <span style="color:var(--red);font-weight:700">${st.DAMAGED} damaged</span>` : ""}${l.dirty ? ` · <span class="pending">not synced</span>` : ""}</p>
+          ${statBar(st)}
+        </div>
+        <div class="util">${Math.round(st.util * 100)}%<small>in use</small></div>
+      </div>`).join("") : `<div class="empty">${live.length ? "No matches." : "No locations yet.<br>Tap <b>+ Location</b> to add your first panel site."}</div>`}
+    </div>`}`;
+  $("#q").oninput = e => { route.q = e.target.value; const pos = e.target.selectionStart; renderHome(); const el = $("#q"); el.focus(); el.setSelectionRange(pos, pos); };
+  document.querySelectorAll(".seg button").forEach(b => b.onclick = () => { route.mode = b.dataset.mode; renderHome(); });
+  const open = id => { route = {view:"loc", id, panel:0, q: route.q, mode: route.mode}; render(); scrollTo(0,0); };
+  if (mode === "list") $("#list").onclick = e => { const c = e.target.closest(".card"); if (c) open(c.dataset.id); };
+  else if (window.L) {
+    homeMap = L.map("homeMap").setView([32.7357, -97.1081], 12); tiles().addTo(homeMap);
+    const pts = [];
+    for (const [l, st] of shown) if (hasGeo(l)) {
+      const ll = [parseFloat(l.lat), parseFloat(l.lng)]; pts.push(ll);
+      L.marker(ll, {icon: pinIcon(st.DAMAGED ? "#C8102E" : "#1F2A5C")}).addTo(homeMap)
+        .bindPopup(`<b>${esc(l.name)}</b><br>${esc(l.address)}<br>${st.inUse}/${st.total} in use${st.DAMAGED ? ` · ${st.DAMAGED} damaged` : ""}<br><a href="#" data-open="${l.id}">Open →</a>`);
+    }
+    if (pts.length) homeMap.fitBounds(pts, {padding:[40,40], maxZoom:16});
+    $("#homeMap").addEventListener("click", e => { const a = e.target.closest("[data-open]"); if (a) { e.preventDefault(); open(a.dataset.open); } });
+  } else $("#homeMap").innerHTML = `<div class="empty">Map needs an internet connection.</div>`;
+}
+
+function renderLocation(loc){
+  killMaps();
+  loc.attachments = loc.attachments || [];
+  const pi = Math.min(route.panel || 0, loc.panels.length - 1);
+  route.panel = pi;
+  const p = loc.panels[pi];
+  const st = statsOf(loc);
+  const conns = [...new Set(p.modules.map(m => m.conn))].join("/");
+  $("#app").innerHTML = `
+    <div class="row noprint" style="margin-bottom:10px">
+      <button class="btn" id="back">← All locations</button>
+      <div class="grow"></div>
+      <button class="btn" id="print">Print / PDF</button>
+      <button class="btn danger" id="delLoc">Delete location</button>
+    </div>
+    <div class="printonly" style="border-bottom:3px solid var(--red);margin-bottom:8px">
+      <div style="background:var(--navy);color:#fff;padding:8px 10px;font-weight:800;font-size:20px">FIBER PANEL GUIDE</div>
+    </div>
+    <div class="sect">
+      <h2>Location</h2>
+      <div class="fields">
+        <label class="span2">Location name<input data-l="name" value="${esc(loc.name)}"></label>
+        <label class="span2">Address<input data-l="address" value="${esc(loc.address)}"></label>
+        <label>Latitude<input data-l="lat" value="${esc(loc.lat)}" inputmode="decimal" placeholder="32.7357"></label>
+        <label>Longitude<input data-l="lng" value="${esc(loc.lng)}" inputmode="decimal" placeholder="-97.1081"></label>
+        <label class="span2 noprint">Notes<input data-l="notes" value="${esc(loc.notes)}"></label>
+      </div>
+      <div class="row noprint" style="margin:10px 0 8px">
+        <button class="btn" id="gps">📍 Use my GPS</button>
+        <button class="btn" id="gmaps" ${hasGeo(loc) ? "" : "disabled"}>Open in Google Maps</button>
+        <span class="note">Tap the map to drop or move the pin.</span>
+      </div>
+      <div id="locMap" class="map noprint"></div>
+      <p class="note noprint" style="margin:8px 0 0">${loc.panels.length} panel(s) · ${st.inUse}/${st.total} ports in use · ${st.DAMAGED} damaged · ${st.low} low light (&lt; ${settings.low} dBm)</p>
+    </div>
+    <div class="tabs">
+      ${loc.panels.map((x, i) => `<button class="tab ${i === pi ? "on" : ""}" data-p="${i}">${esc(x.name || "Panel " + (i+1))}</button>`).join("")}
+      <button class="tab" id="addPanel">+ Panel</button>
+    </div>
+    <div class="sect">
+      <h2>Panel</h2>
+      <div class="fields">
+        <label>Panel name<input data-p="name" value="${esc(p.name)}"></label>
+        <label>System ID<input data-p="systemId" value="${esc(p.systemId)}"></label>
+        <label>Date<input type="date" data-p="date" value="${esc(p.date)}"></label>
+        <label>Tech<input data-p="tech" value="${esc(p.tech)}"></label>
+        <label>Panel model<input data-p="module" value="${esc(p.module)}"></label>
+        <label>Ports<input value="${portTotal(p)} · ${conns} · ${p.modules.length} terminal${p.modules.length === 1 ? "" : "s"}" readonly style="background:var(--light)"></label>
+        <label>DATT<input data-p="datt" value="${esc(p.datt)}"></label>
+        <label>Type<input data-p="type" value="${esc(p.type)}"></label>
+      </div>
+    </div>
+    <div id="mods">${p.modules.map((m, mi) => moduleHTML(m, mi)).join("")}</div>
+    <div class="row noprint">
+      <button class="btn primary" id="addMod">+ Terminal (port plate)</button>
+      <div class="grow"></div>
+      <button class="btn" id="dupPanel">Duplicate panel</button>
+      <button class="btn danger" id="delPanel" ${loc.panels.length <= 1 ? "disabled" : ""}>Delete panel</button>
+    </div>
+    <div class="legend" style="margin-top:12px">${TIA.map(([a, bg, fg]) => `<span style="background:${bg};color:${fg};border:1px solid #ccc">${a}</span>`).join("")}<span style="background:#fff;border:1px dashed #333">13–24 = same color + tracer</span></div>
+    <div class="sect noprint" style="margin-top:14px">
+      <h2>Photos, OTDR traces, GIS maps &amp; PDFs</h2>
+      <div class="upl">
+        <select id="upCat"><option value="auto">Type: auto-detect</option>${Object.entries(CATS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
+        <select id="upPanel"><option value="">Whole location</option>${loc.panels.map((x, i) => `<option value="${x.id}" ${i === pi ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+        <label class="btn cyan" style="margin:0">📷 Take photo<input type="file" id="upCam" accept="image/*" capture="environment" hidden></label>
+        <label class="btn primary" style="margin:0">⬆ Add files<input type="file" id="upFiles" multiple hidden accept="image/*,.pdf,.sor,.trc,.msor,.kml,.kmz,.csv,.txt"></label>
+      </div>
+      <div class="row" style="margin-bottom:10px" id="attFilter">
+        ${["all", ...Object.keys(CATS)].map(k => `<button class="tab ${ (route.af || "all") === k ? "on" : ""}" data-af="${k}">${k === "all" ? "All" : CATS[k]} (${k === "all" ? loc.attachments.length : loc.attachments.filter(a => a.cat === k).length})</button>`).join("")}
+      </div>
+      <div class="atts" id="atts">${attListHTML(loc)}</div>
+    </div>`;
+  bindLocation(loc, p);
+  initLocMap(loc);
+  hydrateThumbs(loc);
+}
+
+function attListHTML(loc){
+  const af = route.af || "all";
+  const list = loc.attachments.filter(a => af === "all" || a.cat === af).sort((a, b) => (b.addedAt || "").localeCompare(a.addedAt || ""));
+  if (!list.length) return `<div class="note">No files yet.</div>`;
+  return list.map(a => {
+    const pn = a.panelId ? (loc.panels.find(x => x.id === a.panelId) || {}).name || "Removed panel" : "Location";
+    return `<div class="att">
+      <div class="thumb" data-view="${a.id}" data-thumb="${a.id}">${a.type && a.type.startsWith("image/") ? "" : extOf(a.name)}</div>
+      <div class="meta"><b title="${esc(a.name)}">${esc(a.name)}</b><span class="cat">${CATS[a.cat] || a.cat}</span> ${esc(pn)}<br>${fmtSize(a.size || 0)} · ${a.driveId ? "in Drive" : `<span class="pending">waiting to upload</span>`}</div>
+      <div class="acts"><button data-view="${a.id}">Open</button><button data-delatt="${a.id}">Delete</button></div>
+    </div>`;
+  }).join("");
+}
+
+async function hydrateThumbs(loc){
+  for (const a of loc.attachments) {
+    if (!a.type || !a.type.startsWith("image/")) continue;
+    const el = document.querySelector(`[data-thumb="${a.id}"]`); if (!el) continue;
+    let url = thumbUrls.get(a.id);
+    if (!url) { const f = await DB.getFile(a.id); if (f && f.blob) { url = URL.createObjectURL(f.blob); thumbUrls.set(a.id, url); } }
+    if (!url && a.driveId) url = `https://drive.google.com/thumbnail?id=${a.driveId}&sz=w400`;
+    if (url) el.style.backgroundImage = `url("${url}")`;
+  }
+}
+
+function initLocMap(loc){
+  const el = $("#locMap"); if (!el) return;
+  if (!window.L) { el.innerHTML = `<div class="empty">Map needs an internet connection.</div>`; return; }
+  const geo = hasGeo(loc);
+  locMap = L.map(el).setView(geo ? [parseFloat(loc.lat), parseFloat(loc.lng)] : [32.7357, -97.1081], geo ? 18 : 12);
+  const street = tiles().addTo(locMap);
+  const sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxZoom:19, attribution:"Esri imagery"});
+  L.control.layers({"Street": street, "Satellite": sat}).addTo(locMap);
+  let mk = geo ? L.marker([parseFloat(loc.lat), parseFloat(loc.lng)], {draggable:true}).addTo(locMap) : null;
+  const setPos = ll => {
+    loc.lat = ll.lat.toFixed(6); loc.lng = ll.lng.toFixed(6);
+    document.querySelector('[data-l="lat"]').value = loc.lat; document.querySelector('[data-l="lng"]').value = loc.lng;
+    $("#gmaps").disabled = false;
+    if (!mk) { mk = L.marker(ll, {draggable:true}).addTo(locMap); mk.on("dragend", () => setPos(mk.getLatLng())); } else mk.setLatLng(ll);
+    scheduleSave(loc);
+  };
+  if (mk) mk.on("dragend", () => setPos(mk.getLatLng()));
+  locMap.on("click", e => setPos(e.latlng));
+  $("#gps").onclick = () => {
+    if (!navigator.geolocation) return toast("GPS not available");
+    toast("Getting GPS fix…");
+    navigator.geolocation.getCurrentPosition(pos => {
+      const ll = L.latLng(pos.coords.latitude, pos.coords.longitude); setPos(ll); locMap.setView(ll, 18);
+      toast(`Pinned (±${Math.round(pos.coords.accuracy)} m)`);
+    }, err => toast("GPS error: " + err.message), {enableHighAccuracy:true, timeout:15000});
+  };
+}
+
+function moduleHTML(m, mi){
+  const ports = m.ports;
+  const lowCls = i => { const v = parseFloat(ports[i].l); return !isNaN(v) && v < settings.low ? "lowlight" : ""; };
+  const chunk = start => {
+    const idx = Array.from({length:12}, (_, k) => start + k);
+    const tracer = start >= 12;
+    return `<div class="scroll"><table class="grid">
+      <tr><th class="lab">Port</th>${idx.map(i => { const [, bg, fg] = TIA[i % 12]; return `<th class="port" style="background:${bg};color:${fg};${tracer ? "border-bottom:4px dashed " + (fg === "#000" ? "#000" : "#fff") : ""}">${i+1}</th>`; }).join("")}</tr>
+      <tr><th class="lab">Status</th>${idx.map(i => { const pt = ports[i]; return `<td class="st-${esc((pt.s||"").toUpperCase())}"><select data-m="${mi}" data-i="${i}" data-k="s"><option value=""></option>${STATUSES.map(s => `<option ${pt.s === s ? "selected" : ""}>${s}</option>`).join("")}</select></td>`; }).join("")}</tr>
+      <tr><th class="lab">Patch</th>${idx.map(i => `<td><input data-m="${mi}" data-i="${i}" data-k="p" value="${esc(ports[i].p)}"></td>`).join("")}</tr>
+      <tr><th class="lab">Level (dBm)</th>${idx.map(i => `<td class="${lowCls(i)}"><input data-m="${mi}" data-i="${i}" data-k="l" value="${esc(ports[i].l)}" inputmode="decimal" class="${lowCls(i)}"></td>`).join("")}</tr>
+      <tr><th class="lab">Dist (ft)</th>${idx.map(i => `<td><input data-m="${mi}" data-i="${i}" data-k="d" value="${esc(ports[i].d)}" inputmode="numeric"></td>`).join("")}</tr>
+      <tr><th class="lab">Circuit ID</th>${Array.from({length:6}, (_, k) => { const ci = start / 2 + k; return `<td colspan="2"><input data-m="${mi}" data-c="${ci}" value="${esc(m.circuits[ci])}" placeholder="${ci*2+1}–${ci*2+2}"></td>`; }).join("")}</tr>
+    </table></div>`;
+  };
+  return `<div class="mod">
+    <div class="modhead"><b>TERMINAL ${esc(m.letter)}</b>
+      <select data-m="${mi}" data-k="count" class="noprint" style="border:0;border-radius:5px;margin-right:4px;padding:3px;background:#fff;color:#1b1f2e;font-weight:700">${[12,24].map(n => `<option value="${n}" ${m.count == n ? "selected" : ""}>${n} ports</option>`).join("")}</select>
+      <select data-m="${mi}" data-k="conn" class="noprint" style="border:0;border-radius:5px;margin-right:8px;padding:3px;background:#fff;color:#1b1f2e;font-weight:700">${["LC","SC"].map(c => `<option ${m.conn === c ? "selected" : ""}>${c}</option>`).join("")}</select>
+      <span class="printonly" style="padding-right:8px">${m.count} ${esc(m.conn)}</span>
+      <span>TO:</span><input data-m="${mi}" data-k="to" value="${esc(m.to)}" placeholder="Destination">
+      <button class="x noprint" data-rmterm="${mi}" title="Remove terminal">✕</button></div>
+    ${chunk(0)}${m.count > 12 ? `<div style="height:4px;background:var(--navy)"></div>${chunk(12)}` : ""}</div>`;
+}
+
+function bindLocation(loc, p){
+  $("#back").onclick = () => { route = {view:"home", q: route.q, mode: route.mode}; render(); };
+  $("#print").onclick = () => window.print();
+  $("#gmaps").onclick = () => window.open(`https://www.google.com/maps/search/?api=1&query=${loc.lat},${loc.lng}`, "_blank");
+  $("#delLoc").onclick = async () => {
+    if (!confirm(`Delete "${loc.name}" and all its panels? This also removes its tab from the Google Sheet (files stay in Drive).`)) return;
+    loc.deleted = true; await touch(loc); route = {view:"home"}; render(); toast("Location deleted");
+  };
+  document.querySelectorAll(".tab[data-p]").forEach(b => b.onclick = () => { route.panel = +b.dataset.p; render(); });
+  $("#addPanel").onclick = () => openTermDialog("A", "New panel — Terminal A", async (letter, count, conn) => {
+    const np = newPanel(loc.panels.length + 1, 1, count, conn); np.modules[0].letter = letter;
+    loc.panels.push(np); route.panel = loc.panels.length - 1; await touch(loc); render();
+  });
+  $("#dupPanel").onclick = async () => {
+    const c = JSON.parse(JSON.stringify(p)); c.id = uid(); c.name = p.name + " (copy)";
+    loc.panels.push(c); route.panel = loc.panels.length - 1; await touch(loc); render();
+  };
+  $("#delPanel").onclick = async () => {
+    if (!confirm(`Delete ${p.name}?`)) return;
+    loc.panels.splice(route.panel, 1); route.panel = 0; await touch(loc); render();
+  };
+  $("#addMod").onclick = () => {
+    const last = p.modules[p.modules.length - 1];
+    openTermDialog(nextLetter(p), "Add terminal to " + (p.name || "panel"), async (letter, count, conn) => {
+      if (p.modules.some(m => m.letter.toUpperCase() === letter.toUpperCase())) return toast(`Terminal ${letter} already exists`);
+      const m = newModule(0, count, conn); m.letter = letter; p.modules.push(m); await touch(loc); render();
+      setTimeout(() => document.querySelectorAll(".mod")[p.modules.length - 1]?.scrollIntoView({behavior:"smooth", block:"center"}), 50);
+    }, last ? last.count : 12, last ? last.conn : "LC");
+  };
+  $("#mods").addEventListener("click", async e => {
+    const b = e.target.closest("[data-rmterm]"); if (!b) return;
+    const mi = +b.dataset.rmterm, m = p.modules[mi];
+    if (p.modules.length <= 1) return toast("A panel needs at least one terminal");
+    const used = m.to || m.circuits.some(Boolean) || m.ports.some(x => x.s || x.p || x.l || x.d);
+    if (!confirm(`Remove Terminal ${m.letter}${used ? " and all its port data" : ""}?`)) return;
+    p.modules.splice(mi, 1); await touch(loc); render();
+  });
+  // attachments
+  document.querySelectorAll("[data-af]").forEach(b => b.onclick = () => { route.af = b.dataset.af; render(); });
+  const addFiles = async files => {
+    const catSel = $("#upCat").value, panelId = $("#upPanel").value;
+    let n = 0;
+    for (let f of files) {
+      if (f.size > 45e6) { toast(`${f.name} is over 45 MB, skipped`); continue; }
+      const cat = catSel === "auto" ? guessCat(f) : catSel;
+      if (cat === "photo") f = await shrinkImage(f);
+      const a = {id: uid(), name: f.name, type: f.type || "application/octet-stream", size: f.size, cat, panelId, addedAt: now(), by: settings.tech || ""};
+      await DB.putFile({id: a.id, locId: loc.id, blob: f});
+      loc.attachments.push(a); n++;
+    }
+    if (n) { await touch(loc); toast(`${n} file(s) added`); render(); }
+  };
+  $("#upFiles").onchange = e => { addFiles([...e.target.files]); e.target.value = ""; };
+  $("#upCam").onchange = e => { addFiles([...e.target.files]); e.target.value = ""; };
+  $("#atts").onclick = async e => {
+    const v = e.target.closest("[data-view]"), d = e.target.closest("[data-delatt]");
+    if (v) {
+      const a = loc.attachments.find(x => x.id === v.dataset.view); if (!a) return;
+      const f = await DB.getFile(a.id);
+      if (f && f.blob) window.open(URL.createObjectURL(f.blob), "_blank");
+      else if (a.url) window.open(a.url, "_blank");
+      else toast("File not on this device yet");
+    }
+    if (d) {
+      const a = loc.attachments.find(x => x.id === d.dataset.delatt); if (!a || !confirm(`Delete ${a.name}?`)) return;
+      loc.attachments = loc.attachments.filter(x => x !== a);
+      loc.trash = loc.trash || []; if (a.driveId) loc.trash.push(a.driveId);
+      await DB.delFile(a.id); await touch(loc); render();
+    }
+  };
+  // field edits
+  const app = $("#app");
+  const handler = e => {
+    const el = e.target; const d = el.dataset;
+    p = loc.panels[route.panel] || p;
+    if (el.type === "file" || el.id === "upCat" || el.id === "upPanel") return;
+    if (d.l !== undefined) { loc[d.l] = el.value; if ((d.l === "lat" || d.l === "lng") && e.type === "change") { render(); } }
+    else if (d.p !== undefined && el.tagName !== "BUTTON") {
+      p[d.p] = el.value;
+      if (d.p === "name") { const t = document.querySelector(`.tab[data-p="${route.panel}"]`); if (t) t.textContent = el.value || "Panel"; }
+    }
+    else if (d.m !== undefined) {
+      const m = p.modules[+d.m];
+      if (d.c !== undefined) m.circuits[+d.c] = el.value;
+      else if (d.k === "to") m.to = el.value;
+      else if (d.k === "conn") { if (e.type !== "change") return; m.conn = el.value; scheduleSave(loc); render(); return; }
+      else if (d.k === "count") {
+        if (e.type !== "change") return;
+        const n = +el.value;
+        if (n < m.count && (m.ports.slice(n).some(x => x.s || x.p || x.l || x.d) || m.circuits.slice(n / 2).some(Boolean)) && !confirm(`Terminal ${m.letter} ports ${n+1}–${m.count} have data that will be removed. Continue?`)) { el.value = m.count; return; }
+        resizeModule(m, n); scheduleSave(loc); render(); return;
+      }
+      else {
+        m.ports[+d.i][d.k] = el.value;
+        if (d.k === "s") el.parentElement.className = el.value ? "st-" + el.value : "";
+        if (d.k === "l") { const v = parseFloat(el.value); const low = !isNaN(v) && v < settings.low; el.classList.toggle("lowlight", low); }
+      }
+    } else return;
+    scheduleSave(loc);
+  };
+  app.oninput = handler; app.onchange = handler;
+}
+
+/* ================= save & sync ================= */
+let saveT = null, saveLoc = null;
+function scheduleSave(loc){
+  saveLoc = loc; clearTimeout(saveT);
+  setChip("Saving…", "");
+  saveT = setTimeout(() => touch(loc), 500);
+}
+async function touch(loc){
+  loc.updatedAt = now(); loc.dirty = true;
+  await DB.put(loc);
+  setChip(settings.url ? "Unsynced" : "Saved", settings.url ? "warn" : "ok");
+  scheduleSync();
+}
+function setChip(text, cls){ const c = $("#syncChip"); c.textContent = text; c.className = "chip " + (cls || ""); }
+
+let syncT = null, syncing = false;
+function scheduleSync(delay = 2500){ if (!settings.url) return; clearTimeout(syncT); syncT = setTimeout(sync, delay); }
+
+async function api(action, payload){
+  if (action === "list") {
+    const r = await fetch(`${settings.url}?action=list&key=${encodeURIComponent(settings.key)}`, {redirect:"follow"});
+    const j = await r.json(); if (!j.ok) throw new Error(j.error || "Sync failed"); return j;
+  }
+  const r = await fetch(settings.url, {method:"POST", redirect:"follow", headers:{"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify({action, key: settings.key, ...payload})});
+  const j = await r.json(); if (!j.ok) throw new Error(j.error || "Sync failed"); return j;
+}
+const clean = l => { const c = {...l}; delete c.dirty; delete c.trash; return c; };
+
+async function sync(manual){
+  if (!settings.url || syncing) return;
+  if (!navigator.onLine) { setChip("Offline", "warn"); return; }
+  syncing = true; setChip("Syncing…", "");
+  try {
+    const remote = (await api("list")).locations || [];
+    const rmap = new Map(remote.map(r => [r.id, r]));
+    let pulled = 0, pushed = 0;
+    // pull newer remote
+    for (const r of remote) {
+      const l = locations.find(x => x.id === r.id);
+      if (!l && r.deleted) continue;                           // deleted elsewhere, never had it
+      if (l && r.updatedAt <= l.updatedAt) continue;          // ours is same or newer
+      if (l && isEditing() && route.id === l.id) continue;      // don't yank the screen mid-edit
+      const merged = {...r, attachments: [...(r.attachments || [])], dirty:false};
+      if (l) {                                                 // keep files still waiting to upload here
+        const pend = (l.attachments || []).filter(a => !a.driveId && !merged.attachments.some(x => x.id === a.id));
+        if (pend.length) { merged.attachments.push(...pend); merged.dirty = true; merged.updatedAt = now(); }
+        if (l.trash) merged.trash = l.trash;
+        for (const k of Object.keys(l)) delete l[k];
+        Object.assign(l, merged); await DB.put(l);
+      } else { locations.push(merged); await DB.put(merged); }
+      pulled++;
+    }
+    // push dirty local
+    for (const l of locations.filter(x => x.dirty)) {
+      const r = rmap.get(l.id);
+      if (r && r.updatedAt > l.updatedAt) continue;
+      if (l.deleted && !r) { await DB.del(l.id); locations = locations.filter(x => x !== l); continue; }
+      // upload any files waiting on this device
+      for (const a of (l.attachments || []).filter(x => !x.driveId)) {
+        const f = await DB.getFile(a.id); if (!f || !f.blob) continue;
+        setChip(`Uploading ${a.name}…`, "");
+        const res = await api("upload", {locationId: l.id, locationName: l.name, attachment: a, data: await blobToB64(f.blob)});
+        a.driveId = res.driveId; a.url = res.url;
+        await DB.put(l);
+      }
+      const trash = l.trash || [];
+      await api("upsert", {location: clean(l), trash});
+      if (trash.length) delete l.trash;
+      for (const a of (l.attachments || [])) if (a.driveId) {
+        const f = await DB.getFile(a.id);
+        if (f) { if (f.blob && a.type.startsWith("image/") && !thumbUrls.has(a.id)) thumbUrls.set(a.id, URL.createObjectURL(f.blob)); await DB.delFile(a.id); }
+      }
+      l.dirty = false; await DB.put(l); pushed++;
+    }
+    // purge synced tombstones
+    for (const l of locations.filter(x => x.deleted && !x.dirty)) { await DB.del(l.id); }
+    locations = locations.filter(x => !(x.deleted && !x.dirty));
+    await DB.setMeta("lastSync", now());
+    setChip("Synced", "ok");
+    if (manual) toast(`Synced · ${pushed} sent, ${pulled} received`);
+    if (pulled && !isEditing()) render();
+  } catch (e) {
+    console.error(e); setChip("Sync error", "err");
+    if (manual) toast("Sync error: " + e.message);
+  } finally { syncing = false; }
+}
+const isEditing = () => { const a = document.activeElement; return a && /INPUT|SELECT|TEXTAREA/.test(a.tagName) && route.view === "loc"; };
+
+/* ================= settings / dialogs ================= */
+$("#fab").onclick = () => { $("#formLoc").reset(); $("#dlgLoc").showModal(); };
+$("#dlgLoc").addEventListener("close", async () => {
+  if ($("#dlgLoc").returnValue !== "ok") return;
+  const f = new FormData($("#formLoc"));
+  const name = (f.get("name") || "").trim(); if (!name) return;
+  if (locations.some(l => !l.deleted && l.name.toLowerCase() === name.toLowerCase())) { toast("A location with that name already exists"); return; }
+  const qty = Math.max(1, Math.min(26, parseInt(f.get("qty"), 10) || 1));
+  const loc = newLocation(name, (f.get("address") || "").trim(), qty, +f.get("count") || 12, f.get("conn") || "LC");
+  locations.push(loc); await touch(loc);
+  route = {view:"loc", id: loc.id, panel:0}; render();
+});
+let termCb = null;
+function openTermDialog(letter, title, cb, count = 12, conn = "LC"){
+  const f = $("#formTerm"); f.reset();
+  f.letter.value = letter; $("#termTitle").textContent = title;
+  f.querySelector(`[name=tcount][value="${count}"]`).checked = true;
+  f.querySelector(`[name=tconn][value="${conn}"]`).checked = true;
+  termCb = cb; $("#dlgTerm").showModal();
+}
+$("#dlgTerm").addEventListener("close", () => {
+  if ($("#dlgTerm").returnValue !== "ok" || !termCb) return;
+  const f = new FormData($("#formTerm"));
+  const letter = String(f.get("letter") || "").trim().toUpperCase(); if (!letter) return;
+  termCb(letter, +f.get("tcount") || 12, f.get("tconn") || "LC"); termCb = null;
+});
+$("#btnSettings").onclick = () => {
+  $("#setUrl").value = settings.url; $("#setKey").value = settings.key; $("#setTech").value = settings.tech; $("#setLow").value = settings.low;
+  $("#dlgSettings").showModal();
+};
+$("#btnSaveSettings").onclick = async () => {
+  settings.url = $("#setUrl").value.trim(); settings.key = $("#setKey").value.trim();
+  settings.tech = $("#setTech").value.trim(); settings.low = parseFloat($("#setLow").value); if (isNaN(settings.low)) settings.low = -25;
+  await DB.setMeta("settings", settings); $("#dlgSettings").close(); render();
+  if (settings.url) sync(true); else setChip("Local", "");
+};
+$("#btnSyncNow").onclick = async () => { settings.url = $("#setUrl").value.trim(); settings.key = $("#setKey").value.trim(); await DB.setMeta("settings", settings); sync(true); };
+$("#btnOpenSheet").onclick = async () => {
+  if (!settings.url) return toast("Add the Apps Script URL first");
+  try { const j = await api("info"); window.open(j.sheetUrl, "_blank"); } catch (e) { toast("Error: " + e.message); }
+};
+$("#btnExport").onclick = () => {
+  const blob = new Blob([JSON.stringify({exported: now(), locations: locations.filter(l => !l.deleted).map(clean)}, null, 1)], {type:"application/json"});
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `panel-guide-backup-${now().slice(0,10)}.json`; a.click();
+};
+$("#fileImport").onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  try {
+    const data = JSON.parse(await f.text()); let n = 0;
+    for (const r of data.locations || []) {
+      const l = locations.find(x => x.id === r.id);
+      if (l && l.updatedAt >= r.updatedAt) continue;
+      const rec = {...r, dirty:true};
+      if (l) Object.assign(l, rec); else locations.push(rec);
+      await DB.put(rec); n++;
+    }
+    toast(`Restored ${n} location(s)`); render(); scheduleSync(500);
+  } catch (err) { toast("Not a valid backup file"); }
+  e.target.value = "";
+};
+
+/* ================= boot ================= */
+(async function boot(){
+  const s = await DB.getMeta("settings"); if (s) settings = {...settings, ...s};
+  locations = await DB.all();
+  setChip(settings.url ? "Ready" : "Local", "");
+  render();
+  if (settings.url) sync();
+  addEventListener("online", () => scheduleSync(500));
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") scheduleSync(300); });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", {scope:"./"}).catch(() => {});
+})();
+</script>
+</body>
+</html>
