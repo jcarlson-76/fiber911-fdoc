@@ -1,0 +1,12 @@
+{
+  "name": "Fiber911 Panel Guide",
+  "short_name": "Panels",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#F5F7FB",
+  "theme_color": "#1F2A5C",
+  "icons": [
+    {"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}
