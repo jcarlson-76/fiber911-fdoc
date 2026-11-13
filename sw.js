@@ -1,5 +1,5 @@
 // Fiber911 Panel Guide — offline shell cache. Bump VERSION when you upload a new index.html.
-const VERSION = "panels-v3";
+const VERSION = "panels-v5";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"];
 
@@ -13,6 +13,7 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", e => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.hostname.includes("script.google") || url.hostname.includes("googleusercontent")) return;
+  if (url.origin === location.origin && /\/otdr\/?$/.test(url.pathname)) return; // MaxTester upload page: always live
   // page: network first so updates show, cache fallback for offline
   if (e.request.mode === "navigate") {
     e.respondWith(fetch(e.request).then(r => { const c = r.clone(); caches.open(VERSION).then(x => x.put("./index.html", c)); return r; })

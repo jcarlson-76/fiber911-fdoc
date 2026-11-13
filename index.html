@@ -145,6 +145,7 @@ table.splice td.fnum input{display:inline-block;width:42px;height:28px;border:1p
 .wm-n{cursor:pointer}.wm-n:hover rect:first-child{filter:drop-shadow(0 2px 6px rgba(0,174,239,.6))}
 th.port{cursor:pointer}th.port:hover{outline:3px solid var(--cyan);outline-offset:-3px}
 #dlgTrace{width:min(1100px,96vw)}
+#dlgInbox{width:min(860px,96vw)}
 .tr-chain{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 2px 10px}
 .tr-box{min-width:170px;max-width:220px;border:2px solid var(--navy);border-radius:10px;padding:9px 10px;font-size:12px;line-height:1.45;background:#fff;flex:none}
 .tr-box b{display:block;font-size:13px;color:var(--navy);margin-bottom:3px}
@@ -154,6 +155,18 @@ th.port{cursor:pointer}th.port:hover{outline:3px solid var(--cyan);outline-offse
 .tr-arrow span{font-size:22px;color:var(--navy);font-weight:900;line-height:1}
 .tr-none{padding:16px;color:var(--mute);font-size:13px;align-self:center}
 @media(max-width:700px){.tr-chain{flex-direction:column;align-items:stretch}.tr-box{max-width:none}.tr-arrow{flex-direction:row;gap:8px;padding:4px 0}.tr-arrow span{transform:rotate(90deg)}}
+.dtag{display:inline-block;background:#E4DFEC;color:#5B2C83;font-size:10px;font-weight:800;border-radius:4px;padding:1px 5px;margin:0 3px 0 4px;white-space:nowrap}
+td.notes{display:flex;align-items:center;height:34px}td.notes input{flex:1}
+tr.droprow td{background:#FAF7FD}
+.drop{border:2px solid #7B3FA0;border-radius:12px;margin:14px 0;background:#fff;overflow:hidden}
+.drophead{display:flex;align-items:center;gap:8px;background:#7B3FA0;color:#fff;padding:6px 8px}
+.drophead b{font-size:18px}.drophead select,.dropname{border:0;border-radius:6px;padding:6px 8px;font-weight:700;color:var(--ink);background:#fff}
+.dropname{width:200px}
+.drophead .x{background:transparent;border:0;color:#fff;font-size:18px;cursor:pointer;padding:0 8px}
+.dropbody{display:grid;grid-template-columns:300px 1fr;gap:10px;padding:10px}
+@media(max-width:900px){.dropbody{grid-template-columns:1fr}}
+.side-d{border-top-color:#7B3FA0}.side-d h3{color:#7B3FA0}
+table.splice tr.sh th.sd{background:#7B3FA0}
 .upl select{padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
 @media print{
   @page{size:letter portrait;margin:.4in}
@@ -179,6 +192,7 @@ th.port{cursor:pointer}th.port:hover{outline:3px solid var(--cyan);outline-offse
   <div class="grow"></div>
   <span id="syncChip" class="chip">Local</span>
   <a href="https://locates.fiber911.com/" class="iconbtn noprint" style="text-decoration:none">Locates</a>
+  <button class="iconbtn" id="btnInbox" title="OTDR Inbox">📥</button>
   <button class="iconbtn" id="btnSettings" title="Settings">⚙</button>
 </header>
 <main id="app"></main>
@@ -218,6 +232,41 @@ th.port{cursor:pointer}th.port:hover{outline:3px solid var(--cyan);outline-offse
   <div id="trBody" style="margin-top:12px"></div>
 </div></dialog>
 
+<dialog id="dlgTap"><form method="dialog" class="dlg" id="formTap">
+  <h2>🚦 Traffic signal tap</h2>
+  <p class="note" style="margin-top:-6px">Splices a dedicated pair out of the input (A) and/or output (B) cable into a drop cable, so the signal cabinet is fed from both sides.</p>
+  <div class="fields">
+    <label>Drop name<input name="name"></label>
+    <label>Dedicated fiber pair (A/B cable)<input name="pair" placeholder="7,8"></label>
+  </div>
+  <div class="pickrow"><span>Feed from</span><div class="pick"><label><input type="radio" name="mode" value="both" checked><b>Both sides</b></label><label><input type="radio" name="mode" value="a"><b>A only</b></label><label><input type="radio" name="mode" value="b"><b>B only</b></label></div></div>
+  <div class="pickrow"><span>Drop cable</span><select name="fibers" style="padding:8px;border:1px solid var(--line);border-radius:8px"><option value="2">2F</option><option value="4">4F</option><option value="6" selected>6F</option><option value="8">8F</option><option value="12">12F</option></select></div>
+  <div class="pickrow"><span>Goes to</span><select name="dest" id="tapDest" style="padding:8px;border:1px solid var(--line);border-radius:8px;max-width:260px"></select></div>
+  <p class="note">Both sides with 7,8 into a 6F drop: A7→1, A8→2, B7→3, B8→4, 5–6 spare. A/B fibers 7 and 8 are marked <b>DROP</b>, not passed through.</p>
+  <div class="row" style="justify-content:flex-end;margin-top:14px">
+    <button class="btn" value="cancel" formnovalidate>Cancel</button>
+    <button class="btn primary" value="ok">Create drop</button>
+  </div>
+</form></dialog>
+
+<dialog id="dlgInbox"><div class="dlg">
+  <div class="row"><h2 class="grow" style="margin:0">📥 OTDR Inbox</h2><button class="btn" onclick="this.closest('dialog').close()">Close</button></div>
+  <p class="note">Files uploaded from the MaxTester (<span id="ibUrl"></span>) or dropped in the Drive <b>OTDR Inbox</b> folder. Pick a location, then assign. The fiber/port is read from the file name, so check it before you assign.</p>
+  <div class="row" style="margin:8px 0">
+    <select id="ibLoc" style="padding:8px;border:1px solid var(--line);border-radius:8px;max-width:240px"></select>
+    <select id="ibTarget" style="padding:8px;border:1px solid var(--line);border-radius:8px;max-width:200px"></select>
+    <select id="ibCat" style="padding:8px;border:1px solid var(--line);border-radius:8px"><option value="auto">Type: auto</option><option value="otdr">OTDR trace</option><option value="photo">Panel photo</option><option value="gis">GIS map</option><option value="pdf">Document</option></select>
+  </div>
+  <div id="ibBody" style="max-height:55vh;overflow:auto"></div>
+  <div class="row" style="margin-top:12px">
+    <button class="btn" id="ibRefresh">↻ Refresh</button>
+    <button class="btn" id="ibFolder">Open Drive folder</button>
+    <button class="btn danger" id="ibDelete">Delete selected</button>
+    <div class="grow"></div>
+    <button class="btn primary" id="ibAssign">Assign selected</button>
+  </div>
+</div></dialog>
+
 <dialog id="dlgSettings"><div class="dlg">
   <h2>Settings &amp; sync</h2>
   <div class="fields">
@@ -227,6 +276,7 @@ th.port{cursor:pointer}th.port:hover{outline:3px solid var(--cyan);outline-offse
     <label>Low-light threshold (dBm)<input id="setLow" type="number" step="0.1"></label>
     <label>Max splice loss (dB)<input id="setLoss" type="number" step="0.01"></label>
   </div>
+  <p class="note">MaxTester upload page: <b id="setOtdrUrl"></b> (open it in the MaxTester's browser over Wi-Fi).</p>
   <p class="note">Data is saved on this device first, then synced to the shared Google Sheet. Each location becomes its own tab in the Sheet.</p>
   <div class="row" style="margin-top:8px">
     <button class="btn cyan" id="btnSyncNow">Sync now</button>
@@ -310,7 +360,11 @@ function upgradeLoc(l){
     m.ports = m.ports || []; while (m.ports.length < m.count) m.ports.push({s:"",p:"",l:"",d:""});
     m.circuits = m.circuits || []; while (m.circuits.length < m.count / 2) m.circuits.push("");
   }
-  for (const sp of l.splices) { sp.a = {...blankSide(), ...(sp.a || {})}; sp.b = {...blankSide(), ...(sp.b || {})}; sp.rows = sp.rows || []; }
+  for (const sp of l.splices) {
+    sp.a = {...blankSide(), ...(sp.a || {})}; sp.b = {...blankSide(), ...(sp.b || {})}; sp.rows = sp.rows || [];
+    for (const k of ["lat", "lng", "gpsAcc", "gpsAt"]) if (sp[k] === undefined) sp[k] = "";
+    sp.drops = (sp.drops || []).map(d => ({...d, side: {...blankSide(), ...(d.side || {})}, rows: d.rows || []}));
+  }
   return l;
 }
 function resizeModule(m, count){
@@ -376,20 +430,32 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200); }
 
 /* ================= splices ================= */
-const SPL_ST = ["SPLICED","PASS","SPARE","CUT","BAD"];
-const SPL_COLORS = {SPLICED:["#C6EFCE","#006100"], PASS:["#DDEBF7","#1F4E78"], SPARE:["#EDEDED","#404040"], CUT:["#D9D9D9","#262626"], BAD:["#FFC7CE","#9C0006"]};
+const SPL_ST = ["SPLICED","PASS","DROP","SPARE","CUT","BAD"];
+const SPL_COLORS = {SPLICED:["#C6EFCE","#006100"], PASS:["#DDEBF7","#1F4E78"], DROP:["#E4DFEC","#5B2C83"], SPARE:["#EDEDED","#404040"], CUT:["#D9D9D9","#262626"], BAD:["#FFC7CE","#9C0006"]};
 const FIBER_COUNTS = [6,12,24,36,48,72,96,144,216,288,432];
+const DROP_COUNTS = [2,4,6,8,12,24,48];
 const blankSide = () => ({loc:"", panel:"", term:"", spl:"", other:"", cable:""});
 const mkRow = (i, per = 12) => ({t: String(Math.ceil(i / per)), af: i, ap:"", bf: i, bp:"", l:"", s:"", n:""});
+const mkDropRow = i => ({df: i, from:"", f:"", p:"", l:"", s:"", n:""});
 function newSplice(n){
   return {id: uid(), name: "Splice " + n, closure:"", method:"Fusion", date: localDate(), tech: settings.tech || "",
-    fibers: 12, perTray: 12, a: blankSide(), b: blankSide(), rows: Array.from({length:12}, (_, i) => mkRow(i + 1))};
+    fibers: 12, perTray: 12, a: blankSide(), b: blankSide(), rows: Array.from({length:12}, (_, i) => mkRow(i + 1)),
+    lat:"", lng:"", gpsAcc:"", gpsAt:"", drops: []};
+}
+function newDrop(n, fibers = 6){
+  return {id: uid(), name: "Drop " + n, side: blankSide(), fibers, rows: Array.from({length: fibers}, (_, i) => mkDropRow(i + 1))};
 }
 function resizeSplice(sp, n){
   const per = +sp.perTray || 12;
   while (sp.rows.length < n) sp.rows.push(mkRow(sp.rows.length + 1, per));
   sp.rows.length = n; sp.fibers = n;
 }
+function resizeDrop(dr, n){
+  while (dr.rows.length < n) dr.rows.push(mkDropRow(dr.rows.length + 1));
+  dr.rows.length = n; dr.fibers = n;
+}
+// side keys: "a", "b", or "d0", "d1"... for drops
+const getSide = (sp, key) => key === "a" || key === "b" ? sp[key] : ((sp.drops || [])[+key.slice(1)] || {}).side;
 const tubeOf = f => Math.ceil(f / 12);
 function fiberChip(f){
   f = parseInt(f, 10); if (!f || f < 1) return "";
@@ -397,6 +463,7 @@ function fiberChip(f){
   return `<span class="fc" title="Tube ${tubeOf(f)} (${t[0]})" style="background:${t[1]};color:${t[2]}">${t[0]}</span><span class="fc" title="Fiber ${((f - 1) % 12) + 1} (${c[0]})" style="background:${c[1]};color:${c[2]}">${c[0]}</span>`;
 }
 function resolveSide(s){
+  s = s || {};
   const loc = s.loc ? locations.find(l => l.id === s.loc && !l.deleted) : null;
   const panel = loc ? loc.panels.find(p => p.id === s.panel) : null;
   const term = panel && s.term ? panel.modules.find(m => m.letter === s.term) : null;
@@ -416,37 +483,41 @@ function derivedPort(s, f){
   const pt = r.term.ports[f - 1] || {};
   return {label: `${r.term.letter}-${f}`, status: (pt.s || "").toUpperCase(), circuit: r.term.circuits[Math.floor((f - 1) / 2)] || ""};
 }
-// all splices (any location) that land on this panel/terminal
+// which drop fibers take this A or B fiber
+function dropsUsing(sp, from, f){
+  const out = []; f = parseInt(f, 10); if (!f) return out;
+  (sp.drops || []).forEach((dr, di) => dr.rows.forEach(r => { if (r.from === from && parseInt(r.f, 10) === f) out.push({dr, di, r}); }));
+  return out;
+}
+// all splices (any location) that land on this panel/terminal, including drops
 function splicesFor(panelId, letter){
   const out = [];
   for (const l of locations) if (!l.deleted) (l.splices || []).forEach((sp, i) => {
-    for (const side of ["a", "b"]) {
-      const s = sp[side];
-      if (s.panel === panelId && (!s.term || s.term === letter)) out.push({loc: l, sp, idx: i, side: side.toUpperCase()});
-    }
+    const sides = [["A", sp.a], ["B", sp.b], ...(sp.drops || []).map(d => ["Drop", d.side])];
+    for (const [lab, s] of sides) if (s && s.panel === panelId && (!s.term || s.term === letter)) out.push({loc: l, sp, idx: i, side: lab});
   });
   return out;
 }
 
-function sidePickerHTML(sp, side){
-  const s = sp[side], r = resolveSide(s);
+function sidePickerHTML(sp, key, title, cls){
+  const s = getSide(sp, key), r = resolveSide(s);
   const locs = locations.filter(l => !l.deleted).sort((a, b) => a.name.localeCompare(b.name));
-  return `<div class="side side-${side}">
-    <h3>${side === "a" ? "Side A — before (upstream)" : "Side B — after (downstream)"}</h3>
+  return `<div class="side ${cls || "side-" + key}">
+    ${title ? `<h3>${title}</h3>` : ""}
     <div class="fields" style="grid-template-columns:1fr 1fr">
-      <label class="span2">Location<select data-sd="${side}" data-k="loc">
+      <label class="span2">Location<select data-sd="${key}" data-k="loc">
         <option value="">— Other / not in app —</option>
         ${locs.map(l => `<option value="${l.id}" ${s.loc === l.id ? "selected" : ""}>${esc(l.name)}</option>`).join("")}
       </select></label>
       ${r.loc ? `
-      <label>Panel or splice<select data-sd="${side}" data-k="panel"><option value="">— choose —</option>
+      <label>Panel or splice<select data-sd="${key}" data-k="panel"><option value="">— choose —</option>
         ${r.loc.panels.length ? `<optgroup label="Panels">${r.loc.panels.map(p => `<option value="${p.id}" ${s.panel === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</optgroup>` : ""}
         ${(r.loc.splices || []).filter(x => x.id !== sp.id).length ? `<optgroup label="Splices (splice-to-splice)">${r.loc.splices.filter(x => x.id !== sp.id).map(x => `<option value="spl:${x.id}" ${s.spl === x.id ? "selected" : ""}>⇄ ${esc(x.name)}</option>`).join("")}</optgroup>` : ""}
       </select></label>
-      <label>Terminal<select data-sd="${side}" data-k="term" ${r.panel ? "" : "disabled"}><option value="">— whole panel —</option>
+      <label>Terminal<select data-sd="${key}" data-k="term" ${r.panel ? "" : "disabled"}><option value="">— whole panel —</option>
         ${r.panel ? r.panel.modules.map(m => `<option value="${esc(m.letter)}" ${s.term === m.letter ? "selected" : ""}>Terminal ${esc(m.letter)} · ${m.count} ${esc(m.conn)}</option>`).join("") : ""}</select></label>`
-      : `<label class="span2">Describe<input data-sd="${side}" data-k="other" value="${esc(s.other)}" placeholder="e.g. CO, building MDF, cable stub"></label>`}
-      <label class="span2">Cable ID / count<input data-sd="${side}" data-k="cable" value="${esc(s.cable)}" placeholder="e.g. 144F-ARL-031"></label>
+      : `<label class="span2">Describe<input data-sd="${key}" data-k="other" value="${esc(s.other)}" placeholder="e.g. CO, building MDF, signal cabinet"></label>`}
+      <label class="span2">Cable ID / count<input data-sd="${key}" data-k="cable" value="${esc(s.cable)}" placeholder="${key[0] === "d" ? "e.g. 6F drop" : "e.g. 144F-ARL-031"}"></label>
     </div>
     ${r.spl ? `<button class="linkbtn noprint" data-golsp="${r.loc.id}" data-spidx="${r.loc.splices.indexOf(r.spl)}">Open ⇄ ${esc(r.spl.name)} →</button>` : r.loc ? `<button class="linkbtn noprint" data-goto="${r.loc.id}" data-gpanel="${r.panel ? r.panel.id : ""}">Open ${esc(r.loc.name)} →</button>` : ""}
   </div>`;
@@ -457,7 +528,9 @@ function spliceRowHTML(sp, r, i){
   const lv = parseFloat(r.l), bad = !isNaN(lv) && lv > settings.maxLoss;
   const st = SPL_COLORS[r.s];
   const portCell = (d, val, k) => `<td class="${d && d.status ? "st-" + d.status : ""}" title="${d ? esc((d.status || "no status") + (d.circuit ? " · " + d.circuit : "")) : ""}"><input data-r="${i}" data-k="${k}" value="${esc(val)}" placeholder="${d ? esc(d.label) : ""}"></td>`;
-  return `<tr>
+  const da = dropsUsing(sp, "a", r.af), db = dropsUsing(sp, "b", r.af);
+  const dtag = (list, side) => list.map(x => `<span class="dtag" title="${side} fiber ${r.af} → ${esc(x.dr.name)} fiber ${x.r.df}">${side}⤵ ${esc(x.dr.name)}·${x.r.df}</span>`).join("");
+  return `<tr class="${da.length || db.length ? "droprow" : ""}">
     <td><input data-r="${i}" data-k="t" value="${esc(r.t)}"></td>
     <td class="fnum"><b>${r.af}</b>${fiberChip(r.af)}</td>
     ${portCell(ad, r.ap, "ap")}
@@ -466,8 +539,45 @@ function spliceRowHTML(sp, r, i){
     ${portCell(bd, r.bp, "bp")}
     <td class="${bad ? "lowlight" : ""}"><input data-r="${i}" data-k="l" value="${esc(r.l)}" inputmode="decimal" class="${bad ? "lowlight" : ""}"></td>
     <td style="${st ? `background:${st[0]};color:${st[1]}` : ""}"><select data-r="${i}" data-k="s"><option value=""></option>${SPL_ST.map(s => `<option ${r.s === s ? "selected" : ""}>${s}</option>`).join("")}</select></td>
-    <td><input data-r="${i}" data-k="n" value="${esc(r.n)}" style="text-align:left;padding-left:6px"></td>
+    <td class="notes">${dtag(da, "A")}${dtag(db, "B")}<input data-r="${i}" data-k="n" value="${esc(r.n)}" style="text-align:left;padding-left:6px"></td>
   </tr>`;
+}
+
+function dropHTML(sp, dr, di){
+  const key = "d" + di;
+  const rows = dr.rows.map((r, ri) => {
+    const srcSide = r.from === "a" ? sp.a : r.from === "b" ? sp.b : null;
+    const sd = srcSide && r.f ? derivedPort(srcSide, r.f) : null;
+    const dd = derivedPort(dr.side, r.df);
+    const lv = parseFloat(r.l), bad = !isNaN(lv) && lv > settings.maxLoss, st = SPL_COLORS[r.s];
+    return `<tr>
+      <td class="fnum"><b>${r.df}</b>${fiberChip(r.df)}</td>
+      <td class="${dd && dd.status ? "st-" + dd.status : ""}" title="${dd ? esc((dd.status || "no status") + (dd.circuit ? " · " + dd.circuit : "")) : ""}"><input data-dr="${di}" data-r="${ri}" data-k="p" value="${esc(r.p)}" placeholder="${dd ? esc(dd.label) : ""}"></td>
+      <td class="arrow">←</td>
+      <td><select data-dr="${di}" data-r="${ri}" data-k="from"><option value="">—</option><option value="a" ${r.from === "a" ? "selected" : ""}>A (input)</option><option value="b" ${r.from === "b" ? "selected" : ""}>B (output)</option></select></td>
+      <td class="fnum"><input data-dr="${di}" data-r="${ri}" data-k="f" value="${esc(r.f)}" inputmode="numeric" style="width:42px"><span data-dchip="${di}:${ri}">${fiberChip(r.f)}</span></td>
+      <td title="${sd ? esc(sd.label) : ""}" class="note" style="font-size:11px">${sd ? esc(sd.label) : ""}</td>
+      <td class="${bad ? "lowlight" : ""}"><input data-dr="${di}" data-r="${ri}" data-k="l" value="${esc(r.l)}" inputmode="decimal" class="${bad ? "lowlight" : ""}"></td>
+      <td style="${st ? `background:${st[0]};color:${st[1]}` : ""}"><select data-dr="${di}" data-r="${ri}" data-k="s"><option value=""></option>${SPL_ST.filter(s => s !== "DROP").map(s => `<option ${r.s === s ? "selected" : ""}>${s}</option>`).join("")}</select></td>
+      <td><input data-dr="${di}" data-r="${ri}" data-k="n" value="${esc(r.n)}" style="text-align:left;padding-left:6px"></td>
+    </tr>`;
+  }).join("");
+  return `<div class="drop">
+    <div class="drophead">
+      <b>⤵</b><input data-drk="${di}" data-k="name" value="${esc(dr.name)}" class="dropname">
+      <select data-drk="${di}" data-k="fibers">${[...new Set([...DROP_COUNTS, dr.fibers])].sort((a, b) => a - b).map(n => `<option value="${n}" ${dr.fibers == n ? "selected" : ""}>${n}F drop</option>`).join("")}</select>
+      <div class="grow"></div>
+      <button class="x noprint" data-rmdrop="${di}" title="Remove drop">✕</button>
+    </div>
+    <div class="dropbody">
+      ${sidePickerHTML(sp, key, "Drop goes to (e.g. signal cabinet)", "side-d")}
+      <div class="mod" style="margin:0"><div class="scroll"><table class="grid splice">
+        <colgroup><col style="width:110px"><col style="width:84px"><col style="width:26px"><col style="width:96px"><col style="width:120px"><col style="width:64px"><col style="width:74px"><col style="width:92px"><col></colgroup>
+        <tr class="sh"><th class="sd">Drop fiber</th><th class="sd">Drop port</th><th></th><th>From cable</th><th>Fiber</th><th>Port</th><th>Loss dB</th><th>Status</th><th>Notes</th></tr>
+        ${rows}
+      </table></div></div>
+    </div>
+  </div>`;
 }
 
 function spliceSectionHTML(loc){
@@ -475,10 +585,13 @@ function spliceSectionHTML(loc){
   if (!loc.splices.length) return `<div class="sect"><div class="empty">No splices at this location yet.<br><br><button class="btn primary" id="addSplice">+ Splice</button></div></div>`;
   const si = Math.min(route.sp || 0, loc.splices.length - 1); route.sp = si;
   const sp = loc.splices[si];
-  const done = sp.rows.filter(r => r.s === "SPLICED" || r.s === "PASS").length;
-  const lossVals = sp.rows.map(r => parseFloat(r.l)).filter(v => !isNaN(v));
-  const avg = lossVals.length ? (lossVals.reduce((a, b) => a + b, 0) / lossVals.length).toFixed(3) : "–";
-  const over = lossVals.filter(v => v > settings.maxLoss).length;
+  sp.drops = sp.drops || [];
+  const done = sp.rows.filter(r => r.s === "SPLICED" || r.s === "PASS" || r.s === "DROP").length;
+  const allLoss = [...sp.rows, ...sp.drops.flatMap(d => d.rows)].map(r => parseFloat(r.l)).filter(v => !isNaN(v));
+  const avg = allLoss.length ? (allLoss.reduce((a, b) => a + b, 0) / allLoss.length).toFixed(3) : "–";
+  const over = allLoss.filter(v => v > settings.maxLoss).length;
+  const geo = sp.lat !== "" && sp.lng !== "" && !isNaN(parseFloat(sp.lat)) && !isNaN(parseFloat(sp.lng));
+  const atts = (loc.attachments || []).filter(a => a.panelId === sp.id);
   return `
     <div class="tabs">
       ${loc.splices.map((x, i) => `<button class="tab ${i === si ? "on" : ""}" data-spi="${i}">⇄ ${esc(x.name || "Splice " + (i + 1))}</button>`).join("")}
@@ -492,21 +605,41 @@ function spliceSectionHTML(loc){
         <label>Date<input type="date" data-sp="date" value="${esc(sp.date)}"></label>
         <label>Tech<input data-sp="tech" value="${esc(sp.tech)}"></label>
         <label>Method<select data-sp="method">${["Fusion","Ribbon fusion","Mechanical"].map(m => `<option ${sp.method === m ? "selected" : ""}>${m}</option>`).join("")}</select></label>
-        <label>Fibers<select data-sp="fibers">${[...new Set([...FIBER_COUNTS, sp.fibers])].sort((a, b) => a - b).map(n => `<option value="${n}" ${sp.fibers == n ? "selected" : ""}>${n}</option>`).join("")}</select></label>
+        <label>Fibers (A/B cables)<select data-sp="fibers">${[...new Set([...FIBER_COUNTS, sp.fibers])].sort((a, b) => a - b).map(n => `<option value="${n}" ${sp.fibers == n ? "selected" : ""}>${n}</option>`).join("")}</select></label>
         <label>Fibers per tray<input data-sp="perTray" value="${esc(sp.perTray)}" inputmode="numeric"></label>
         <label>Progress<input readonly style="background:var(--light)" value="${done}/${sp.rows.length} done · avg ${avg} dB${over ? ` · ${over} over ${settings.maxLoss}` : ""}"></label>
       </div>
     </div>
+    <div class="sect">
+      <h2>Splice case location &amp; photos</h2>
+      <div class="fields">
+        <label>Latitude<input data-sp="lat" value="${esc(sp.lat)}" inputmode="decimal"></label>
+        <label>Longitude<input data-sp="lng" value="${esc(sp.lng)}" inputmode="decimal"></label>
+        <label class="span2">GPS log<input readonly style="background:var(--light)" value="${sp.gpsAt ? `Logged ${new Date(sp.gpsAt).toLocaleString()}${sp.gpsAcc ? ` · ±${sp.gpsAcc} m` : ""}` : "Not logged yet"}"></label>
+      </div>
+      <div class="row noprint" style="margin:10px 0 8px">
+        <button class="btn cyan" id="spGps">📍 Log GPS here</button>
+        <button class="btn" id="spGmaps" ${geo ? "" : "disabled"}>Open in Google Maps</button>
+        <label class="btn primary" style="margin:0">📷 Photo<input type="file" id="spCam" accept="image/*" capture="environment" hidden></label>
+        <button class="btn" id="spInbox">📥 OTDR inbox</button>
+        <label class="btn" style="margin:0">⬆ Files (OTDR, PDF)<input type="file" id="spFiles" multiple hidden accept="image/*,.pdf,.sor,.trc,.msor,.kml,.kmz,.csv,.txt"></label>
+        <span class="note">Tap the map to set or move the splice-case pin.</span>
+      </div>
+      <div id="spMap" class="map noprint" style="height:220px"></div>
+      ${atts.length ? `<div class="atts" style="margin-top:10px" id="spAtts">${atts.map(a => `<div class="att"><div class="thumb" data-view="${a.id}" data-thumb="${a.id}">${a.type && a.type.startsWith("image/") ? "" : extOf(a.name)}</div><div class="meta"><b title="${esc(a.name)}">${esc(a.name)}</b><span class="cat">${CATS[a.cat] || a.cat}</span> ${a.driveId ? "" : `<span class="pending">waiting</span>`}</div></div>`).join("")}</div>` : ""}
+    </div>
     <div class="sides">
-      ${sidePickerHTML(sp, "a")}
+      ${sidePickerHTML(sp, "a", "Side A — input (before / upstream)")}
       <div class="sidearrow">→</div>
-      ${sidePickerHTML(sp, "b")}
+      ${sidePickerHTML(sp, "b", "Side B — output (after / downstream)")}
     </div>
     <div class="row noprint" style="margin:10px 0">
       <button class="btn" id="spFill" title="B fiber = A fiber for every row">1:1 fill</button>
       <button class="btn" id="spTrays">Auto trays</button>
       <button class="btn" id="spAllDone">Mark all spliced</button>
       <button class="btn" id="spSwap">Swap A ⇄ B</button>
+      <button class="btn primary" id="spTap">🚦 Signal tap</button>
+      <button class="btn" id="spAddDrop">+ Drop cable</button>
       <div class="grow"></div>
       <button class="btn" id="spDup">Duplicate</button>
       <button class="btn danger" id="spDel">Delete splice</button>
@@ -516,7 +649,30 @@ function spliceSectionHTML(loc){
       <tr class="sh"><th>Tray</th><th class="sa">A fiber</th><th class="sa">A port</th><th></th><th class="sb">B fiber</th><th class="sb">B port</th><th>Loss dB</th><th>Status</th><th>Notes</th></tr>
       ${sp.rows.map((r, i) => spliceRowHTML(sp, r, i)).join("")}
     </table></div></div>
-    <p class="note">Fiber colors show tube · fiber (TIA-598). Ports fill in automatically when a side is set to a terminal (fiber 1 → port 1); type in a port to override. Loss above ${settings.maxLoss} dB shows red (change in ⚙).</p>`;
+    ${sp.drops.map((dr, di) => dropHTML(sp, dr, di)).join("")}
+    <p class="note">Fiber colors show tube · fiber (TIA-598). Ports fill in automatically when a side is set to a terminal (fiber 1 → port 1); type in a port to override. <b>DROP</b> = that A/B fiber goes to a drop cable instead of passing through. Loss above ${settings.maxLoss} dB shows red (change in ⚙).</p>`;
+}
+
+let spMap = null;
+function initSpliceMap(loc, sp){
+  if (spMap) { spMap.remove(); spMap = null; }
+  const el = $("#spMap"); if (!el) return;
+  if (!window.L) { el.innerHTML = `<div class="empty">Map needs an internet connection.</div>`; return; }
+  const has = v => v !== "" && v !== undefined && !isNaN(parseFloat(v));
+  const center = has(sp.lat) ? [parseFloat(sp.lat), parseFloat(sp.lng)] : hasGeo(loc) ? [parseFloat(loc.lat), parseFloat(loc.lng)] : [32.7357, -97.1081];
+  spMap = L.map(el).setView(center, has(sp.lat) || hasGeo(loc) ? 18 : 12);
+  const street = tiles().addTo(spMap);
+  const sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {maxZoom:19, attribution:"Esri imagery"});
+  L.control.layers({"Street": street, "Satellite": sat}).addTo(spMap);
+  let mk = has(sp.lat) ? L.marker(center, {draggable:true, icon: pinIcon("#007A99")}).addTo(spMap) : null;
+  const setPos = (ll, acc) => {
+    sp.lat = ll.lat.toFixed(6); sp.lng = ll.lng.toFixed(6); sp.gpsAcc = acc != null ? String(Math.round(acc)) : ""; sp.gpsAt = now();
+    if (!mk) { mk = L.marker(ll, {draggable:true, icon: pinIcon("#007A99")}).addTo(spMap); mk.on("dragend", () => setPos(mk.getLatLng())); } else mk.setLatLng(ll);
+    touch(loc).then(render);
+  };
+  if (mk) mk.on("dragend", () => setPos(mk.getLatLng()));
+  spMap.on("click", e => setPos(e.latlng));
+  spMap._setPos = setPos;
 }
 
 function bindSplices(loc){
@@ -529,23 +685,93 @@ function bindSplices(loc){
   };
   document.querySelectorAll("[data-spi]").forEach(b => b.onclick = () => { route.sp = +b.dataset.spi; render(); });
   const sp = (loc.splices || [])[route.sp]; if (!sp) return;
-  $("#spFill").onclick = async () => { sp.rows.forEach(r => r.bf = r.af); await touch(loc); render(); };
+  sp.drops = sp.drops || [];
+  initSpliceMap(loc, sp);
+  $("#spGps").onclick = () => {
+    if (!navigator.geolocation) return toast("GPS not available");
+    toast("Getting GPS fix…");
+    navigator.geolocation.getCurrentPosition(pos => {
+      const ll = {lat: pos.coords.latitude, lng: pos.coords.longitude};
+      sp.lat = ll.lat.toFixed(6); sp.lng = ll.lng.toFixed(6); sp.gpsAcc = String(Math.round(pos.coords.accuracy)); sp.gpsAt = now();
+      touch(loc).then(render); toast(`Splice GPS logged (±${Math.round(pos.coords.accuracy)} m)`);
+    }, err => toast("GPS error: " + err.message), {enableHighAccuracy:true, timeout:20000, maximumAge:0});
+  };
+  $("#spInbox").onclick = () => openInbox(loc);
+  $("#spGmaps").onclick = () => window.open(`https://www.google.com/maps/search/?api=1&query=${sp.lat},${sp.lng}`, "_blank");
+  const up = files => addFilesTo(loc, files, sp.id, "auto");
+  $("#spCam").onchange = e => { up([...e.target.files]); e.target.value = ""; };
+  $("#spFiles").onchange = e => { up([...e.target.files]); e.target.value = ""; };
+  const spAtts = $("#spAtts");
+  if (spAtts) spAtts.onclick = async e => {
+    const v = e.target.closest("[data-view]"); if (!v) return;
+    const a = loc.attachments.find(x => x.id === v.dataset.view); if (!a) return;
+    const f = await DB.getFile(a.id);
+    if (f && f.blob) window.open(URL.createObjectURL(f.blob), "_blank"); else if (a.url) window.open(a.url, "_blank");
+  };
+  $("#spFill").onclick = async () => { sp.rows.forEach(r => { if (r.s !== "DROP") r.bf = r.af; }); await touch(loc); render(); };
   $("#spTrays").onclick = async () => { const per = +sp.perTray || 12; sp.rows.forEach(r => r.t = String(Math.ceil(r.af / per))); await touch(loc); render(); };
-  $("#spAllDone").onclick = async () => { if (!confirm("Set every blank status to SPLICED?")) return; sp.rows.forEach(r => { if (!r.s) r.s = "SPLICED"; }); await touch(loc); render(); };
+  $("#spAllDone").onclick = async () => { if (!confirm("Set every blank status to SPLICED?")) return; sp.rows.forEach(r => { if (!r.s) r.s = "SPLICED"; }); sp.drops.forEach(d => d.rows.forEach(r => { if (!r.s && r.from) r.s = "SPLICED"; })); await touch(loc); render(); };
   $("#spSwap").onclick = async () => {
     [sp.a, sp.b] = [sp.b, sp.a];
     sp.rows.forEach(r => { [r.ap, r.bp] = [r.bp, r.ap]; });
+    sp.drops.forEach(d => d.rows.forEach(r => { r.from = r.from === "a" ? "b" : r.from === "b" ? "a" : r.from; }));
     await touch(loc); render(); toast("Sides swapped");
   };
-  $("#spDup").onclick = async () => { const c = JSON.parse(JSON.stringify(sp)); c.id = uid(); c.name += " (copy)"; loc.splices.push(c); route.sp = loc.splices.length - 1; await touch(loc); render(); };
+  $("#spAddDrop").onclick = async () => { sp.drops.push(newDrop(sp.drops.length + 1)); await touch(loc); render(); };
+  $("#spTap").onclick = () => openTapDialog(loc, sp);
+  $("#spDup").onclick = async () => { const c = JSON.parse(JSON.stringify(sp)); c.id = uid(); c.name += " (copy)"; c.drops.forEach(d => d.id = uid()); loc.splices.push(c); route.sp = loc.splices.length - 1; await touch(loc); render(); };
   $("#spDel").onclick = async () => { if (!confirm(`Delete ${sp.name}?`)) return; loc.splices.splice(route.sp, 1); route.sp = 0; await touch(loc); render(); };
+  document.querySelectorAll("[data-rmdrop]").forEach(b => b.onclick = async () => {
+    const di = +b.dataset.rmdrop, dr = sp.drops[di];
+    if (!confirm(`Remove ${dr.name}? Fibers marked DROP for it go back to blank.`)) return;
+    dr.rows.forEach(r => { if (!r.from || !r.f) return; const still = sp.drops.some((d, j) => j !== di && d.rows.some(x => x.from === r.from && x.f == r.f));
+      if (still) return; const row = r.from === "a" ? sp.rows.find(x => x.af == r.f) : sp.rows.find(x => x.af == r.f);
+      if (row && row.s === "DROP") { row.s = ""; if (row.bf === "") row.bf = row.af; } });
+    sp.drops.splice(di, 1); await touch(loc); render();
+  });
+}
+
+/* ----- traffic signal tap: pair from A and/or B into a small drop ----- */
+let tapCtx = null;
+function openTapDialog(loc, sp){
+  tapCtx = {loc, sp};
+  const f = $("#formTap"); f.reset();
+  f.name.value = "Signal drop"; f.pair.value = "7,8"; f.fibers.value = "6";
+  $("#tapDest").innerHTML = `<option value="">Set later</option>` + locations.filter(l => !l.deleted).sort((a, b) => a.name.localeCompare(b.name)).map(l => `<option value="${l.id}">${esc(l.name)}</option>`).join("");
+  $("#dlgTap").showModal();
+}
+function applyTap(){
+  if (!tapCtx) return;
+  const {loc, sp} = tapCtx; tapCtx = null;
+  const f = new FormData($("#formTap"));
+  const pair = String(f.get("pair") || "").split(/[^0-9]+/).map(Number).filter(n => n > 0 && n <= sp.rows.length);
+  if (!pair.length) return toast("Enter the fiber pair, e.g. 7,8");
+  const mode = f.get("mode") || "both", n = +f.get("fibers") || 6;
+  const froms = mode === "both" ? ["a", "b"] : [mode];
+  if (pair.length * froms.length > n) return toast(`A ${n}F drop can't take ${pair.length * froms.length} fibers`);
+  sp.drops = sp.drops || [];
+  const dr = newDrop(sp.drops.length + 1, n);
+  dr.name = String(f.get("name") || "Signal drop").trim() || "Signal drop";
+  dr.side.cable = n + "F drop";
+  const dest = f.get("dest");
+  if (dest) { const dl = locations.find(l => l.id === dest); dr.side.loc = dest; if (dl && dl.panels.length === 1) { dr.side.panel = dl.panels[0].id; if (dl.panels[0].modules.length === 1) dr.side.term = dl.panels[0].modules[0].letter; } }
+  let k = 0;
+  for (const side of froms) for (const fib of pair) { const r = dr.rows[k++]; r.from = side; r.f = String(fib); }
+  for (; k < n; k++) dr.rows[k].s = "SPARE";
+  for (const fib of pair) {
+    const row = sp.rows.find(r => r.af == fib);
+    if (row) { row.s = "DROP"; if (froms.includes("a") && froms.includes("b")) row.bf = ""; row.n = row.n || `${froms.map(x => x.toUpperCase()).join(" & ")} → ${dr.name}`; }
+  }
+  sp.drops.push(dr);
+  touch(loc).then(render);
+  toast(`${dr.name}: ${froms.map(s => s.toUpperCase() + " " + pair.join("&")).join(", ")} → drop fibers 1–${pair.length * froms.length}`);
 }
 
 // returns true if handled
 function spliceInput(loc, el, e){
   const d = el.dataset;
   const sp = (loc.splices || [])[route.sp];
-  if (!sp || (d.sp === undefined && d.sd === undefined && d.r === undefined)) return false;
+  if (!sp || (d.sp === undefined && d.sd === undefined && d.r === undefined && d.drk === undefined)) return false;
   if (d.sp !== undefined) {
     if (d.sp === "fibers") {
       if (e.type !== "change") return true;
@@ -554,19 +780,40 @@ function spliceInput(loc, el, e){
       resizeSplice(sp, n); scheduleSave(loc); render(); return true;
     }
     sp[d.sp] = el.value;
+    if (d.sp === "lat" || d.sp === "lng") { sp.gpsAt = sp.gpsAt || now(); sp.gpsAcc = ""; if (e.type === "change") { scheduleSave(loc); render(); return true; } }
     if (d.sp === "name") { const t = document.querySelector(`.tab[data-spi="${route.sp}"]`); if (t) t.textContent = "⇄ " + (el.value || "Splice"); }
+  } else if (d.drk !== undefined) {
+    const dr = sp.drops[+d.drk]; if (!dr) return true;
+    if (d.k === "fibers") {
+      if (e.type !== "change") return true;
+      const n = +el.value;
+      if (n < dr.rows.length && dr.rows.slice(n).some(r => r.from || r.l || r.n) && !confirm(`Drop fibers ${n + 1}–${dr.rows.length} have data. Remove them?`)) { el.value = dr.rows.length; return true; }
+      resizeDrop(dr, n); scheduleSave(loc); render(); return true;
+    }
+    dr[d.k] = el.value;
   } else if (d.sd !== undefined) {
-    const s = sp[d.sd];
+    const s = getSide(sp, d.sd); if (!s) return true;
     s[d.k] = el.value;
     if (d.k === "loc") { s.panel = ""; s.term = ""; s.spl = ""; const l = locations.find(x => x.id === el.value); if (l && l.panels.length === 1 && !(l.splices || []).length) s.panel = l.panels[0].id; }
     if (d.k === "panel") { s.term = ""; s.spl = ""; if (el.value.startsWith("spl:")) { s.spl = el.value.slice(4); s.panel = ""; } }
     if (["loc", "panel", "term"].includes(d.k)) { scheduleSave(loc); render(); return true; }
+  } else if (d.dr !== undefined) {
+    const dr = sp.drops[+d.dr], r = dr && dr.rows[+d.r]; if (!r) return true;
+    r[d.k] = el.value;
+    if (d.k === "f") { const c = document.querySelector(`[data-dchip="${d.dr}:${d.r}"]`); if (c) c.innerHTML = fiberChip(el.value); }
+    if ((d.k === "from" || d.k === "f") && e.type === "change") {
+      // mark the A/B row as DROP so it isn't read as a through splice
+      if (r.from && r.f) { const row = sp.rows.find(x => x.af == r.f); if (row && !row.s) { row.s = "DROP"; } }
+      scheduleSave(loc); render(); return true;
+    }
+    if (d.k === "l") { const v = parseFloat(el.value), bad = !isNaN(v) && v > settings.maxLoss; el.classList.toggle("lowlight", bad); el.parentElement.classList.toggle("lowlight", bad); }
+    if (d.k === "s") { const c = SPL_COLORS[el.value]; el.parentElement.style.background = c ? c[0] : ""; el.parentElement.style.color = c ? c[1] : ""; }
   } else {
     const r = sp.rows[+d.r]; if (!r) return true;
     r[d.k] = el.value;
     if (d.k === "bf") {
       const c = document.querySelector(`[data-bchip="${d.r}"]`); if (c) c.innerHTML = fiberChip(el.value);
-      const bp = document.querySelector(`input[data-r="${d.r}"][data-k="bp"]`), dp = derivedPort(sp.b, el.value);
+      const bp = document.querySelector(`input[data-r="${d.r}"][data-k="bp"]:not([data-dr])`), dp = derivedPort(sp.b, el.value);
       if (bp) { bp.placeholder = dp ? dp.label : ""; bp.parentElement.className = dp && dp.status ? "st-" + dp.status : ""; bp.parentElement.title = dp ? (dp.status || "no status") + (dp.circuit ? " · " + dp.circuit : "") : ""; }
     }
     if (d.k === "l") { const v = parseFloat(el.value), bad = !isNaN(v) && v > settings.maxLoss; el.classList.toggle("lowlight", bad); el.parentElement.classList.toggle("lowlight", bad); }
@@ -602,6 +849,13 @@ function buildGraph(){
       if (seen.has(pair)) continue; seen.add(pair);
       const t = s.term ? "Term " + s.term : "";
       edges.push({from, to, label: [s.cable, t].filter(Boolean).join(" · "), fibers: sp.fibers});
+    }
+    for (const [di, dr] of (sp.drops || []).entries()) {
+      const s = dr.side, k = s.spl ? "S:" + s.spl : s.panel ? "P:" + s.panel : "O:" + sp.id + ":d" + di;
+      if (k.startsWith("P:")) { const f = findPanel(s.panel); if (!f) continue; addNode(k, {kind:"P", loc:f.loc, panel:f.panel}); }
+      else if (k.startsWith("S:")) { const f = findSplice(s.spl); if (!f) continue; addNode(k, {kind:"S", loc:f.loc, sp:f.sp, idx:f.idx}); }
+      else addNode(k, {kind:"O", label: s.other || dr.name});
+      edges.push({from: sk, to: k, label: "⤵ " + [dr.name, s.cable].filter(Boolean).join(" · "), fibers: dr.fibers, drop: true});
     }
   }
   return {nodes, edges};
@@ -666,7 +920,7 @@ function wireMapSVG(focusKeys){
   const edgeSVG = L2.edges.map(e => {
     const a = pos.get(e.from), b = pos.get(e.to); if (!a || !b) return "";
     const x1 = a.x + W, y1 = a.y + H / 2, x2 = b.x, y2 = b.y + H / 2, mx = (x1 + x2) / 2;
-    return `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="#1F2A5C" stroke-width="2.5" marker-end="url(#arr)"/>
+    return `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="${e.drop ? "#7B3FA0" : "#1F2A5C"}" stroke-width="2.5" ${e.drop ? 'stroke-dasharray="7 4"' : ""} marker-end="url(#arr)"/>
       ${e.label ? `<text x="${mx}" y="${(y1 + y2) / 2 - 6}" text-anchor="middle" class="wm-el">${esc(trunc(e.label, 24))}</text>` : ""}
       <text x="${mx}" y="${(y1 + y2) / 2 + 12}" text-anchor="middle" class="wm-el2">${e.fibers || ""}F</text>`;
   }).join("");
@@ -712,50 +966,74 @@ function sidePort(sp, side, row){
   const r = resolveSide(s), f = parseInt(side === "a" ? row.af : row.bf, 10);
   return r.term && f && f <= r.term.count ? f : null;
 }
-// follow one fiber out of a terminal port through every splice it hits
 function traceFrom(panelId, letter, port){
   const hops = []; const guard = new Set();
-  let cur = {kind:"T", panelId, letter, port};
-  for (let n = 0; n < 40; n++) {
-    let found = null;
-    if (cur.kind === "T") {
-      outer: for (const l of locations) if (!l.deleted) for (const [idx, sp] of (l.splices || []).entries()) for (const side of ["a", "b"]) {
-        const s = sp[side];
-        if (s.panel !== cur.panelId || (s.term && s.term !== cur.letter)) continue;
-        const ri = sp.rows.findIndex(r => sidePort(sp, side, r) === cur.port);
-        if (ri >= 0 && !guard.has(sp.id + ri)) { found = {l, idx, sp, side, ri}; break outer; }
+  const termMatch = s => s && s.panel === panelId && (!s.term || s.term === letter);
+  // find where the starting port enters a splice
+  let entry = null;
+  outer: for (const l of locations) if (!l.deleted) for (const [idx, sp] of (l.splices || []).entries()) {
+    for (const side of ["a", "b"]) if (termMatch(sp[side])) {
+      const r = sp.rows.find(r => sidePort(sp, side, r) === port);
+      if (r) { const f = parseInt(side === "a" ? r.af : r.bf, 10); if (f) { entry = {l, idx, sp, enter: side, f}; break outer; } }
+      // fiber taken out to a drop (e.g. signal tap) no longer has a through row on this side
+      const rt = resolveSide(sp[side]);
+      if (rt.term && port <= rt.term.count && dropsUsing(sp, side, port).length) { entry = {l, idx, sp, enter: side, f: port}; break outer; }
+    }
+    for (const [di, dr] of (sp.drops || []).entries()) if (termMatch(dr.side)) {
+      const r = dr.rows.find(r => dropPort(dr, r) === port);
+      if (r) { entry = {l, idx, sp, enter: "d" + di, f: r.df}; break outer; }
+    }
+  }
+  for (let n = 0; entry && n < 40; n++) {
+    const {l, idx, sp, enter, f} = entry; entry = null;
+    const gk = sp.id + enter + f; if (guard.has(gk)) break; guard.add(gk);
+    let hop, exitSide, exitPort, outF;
+    if (enter === "a" || enter === "b") {
+      const ds = dropsUsing(sp, enter, f);
+      if (ds.length) {
+        const x = ds[0]; outF = x.r.df; exitSide = x.dr.side; exitPort = dropPort(x.dr, x.r);
+        hop = {row: x.r, inF: f, outF, inCable: sp[enter].cable, outCable: x.dr.side.cable, drop: x.dr.name, inSide: enter.toUpperCase()};
+      } else {
+        const row = sp.rows.find(r => parseInt(enter === "a" ? r.af : r.bf, 10) === f);
+        if (!row) { hops.end = {kind:"X", label: `Fiber ${f} not in ${sp.name}`}; hops.push({loc: l, sp, idx, row: {}, inF: f, outF: "", inCable: sp[enter].cable}); break; }
+        const other = enter === "a" ? "b" : "a";
+        outF = parseInt(other === "a" ? row.af : row.bf, 10);
+        hop = {row, inF: f, outF, inCable: sp[enter].cable, outCable: sp[other].cable, inSide: enter.toUpperCase()};
+        if (!outF) { hops.push({loc: l, sp, idx, ...hop, outF: ""}); hops.end = {kind:"X", label: row.s === "DROP" ? "Dropped here (no drop fiber mapped)" : row.s === "CUT" ? "Fiber cut here" : "Not spliced through"}; break; }
+        exitSide = sp[other]; exitPort = sidePort(sp, other, row);
       }
     } else {
-      const f = findSplice(cur.splId);
-      if (f) {
-        // the next splice is the one that points back at the splice we came from
-        outer2: for (const l of locations) if (!l.deleted) for (const [idx, sp] of (l.splices || []).entries()) for (const side of ["a", "b"]) {
-          if (sp[side].spl !== cur.fromSplId || sp.id !== cur.splId) continue;
-          const ri = sp.rows.findIndex(r => parseInt(side === "a" ? r.af : r.bf, 10) === cur.fiber);
-          if (ri >= 0 && !guard.has(sp.id + ri)) { found = {l, idx, sp, side, ri}; break outer2; }
-        }
-        if (!found) { // fall back: the splice we're entering references nothing back; match by fiber on whichever side is free
-          const sp = f.sp;
-          for (const side of ["a", "b"]) { const ri = sp.rows.findIndex(r => parseInt(side === "a" ? r.af : r.bf, 10) === cur.fiber); if (ri >= 0 && !guard.has(sp.id + ri)) { found = {l: f.loc, idx: f.idx, sp, side, ri}; break; } }
-        }
-      }
+      const dr = sp.drops[+enter.slice(1)], row = dr && dr.rows.find(r => r.df == f);
+      if (!row || !row.from || !row.f) { hops.push({loc: l, sp, idx, row: row || {}, inF: f, outF: "", inCable: dr && dr.side.cable, drop: dr && dr.name}); hops.end = {kind:"X", label: "Drop fiber not spliced to A or B"}; break; }
+      outF = parseInt(row.f, 10); exitSide = sp[row.from]; exitPort = portOnSide(sp, row.from, outF);
+      hop = {row, inF: f, outF, inCable: dr.side.cable, outCable: exitSide.cable, drop: dr.name, fromDrop: true, outSide: row.from.toUpperCase()};
     }
-    if (!found) break;
-    const {l, idx, sp, side, ri} = found; guard.add(sp.id + ri);
-    const row = sp.rows[ri], other = side === "a" ? "b" : "a";
-    const inF = parseInt(side === "a" ? row.af : row.bf, 10), outF = parseInt(other === "a" ? row.af : row.bf, 10);
-    hops.push({loc: l, sp, idx, row, inF, outF, inCable: sp[side].cable, outCable: sp[other].cable});
-    const o = sp[other];
-    if (o.spl) { cur = {kind:"S", splId: o.spl, fromSplId: sp.id, fiber: outF}; continue; }
-    if (o.panel) {
-      const port = sidePort(sp, other, row), fp = findPanel(o.panel);
-      hops.end = {kind:"T", loc: fp && fp.loc, panel: fp && fp.panel, letter: o.term, port, fiber: outF};
-      break;
+    hops.push({loc: l, sp, idx, ...hop});
+    if (exitSide.spl) {
+      const nx = findSplice(exitSide.spl); if (!nx) { hops.end = {kind:"X", label: "Next splice missing"}; break; }
+      // enter the next splice on whichever side points back at this one
+      let en = ["a", "b"].find(k => nx.sp[k].spl === sp.id);
+      if (!en) { const di = (nx.sp.drops || []).findIndex(d => d.side.spl === sp.id); if (di >= 0) en = "d" + di; }
+      entry = {l: nx.loc, idx: nx.idx, sp: nx.sp, enter: en || "a", f: outF};
+      continue;
     }
-    hops.end = {kind:"O", label: o.other || "Not set", fiber: outF};
+    if (exitSide.panel) { const fp = findPanel(exitSide.panel); hops.end = {kind:"T", loc: fp && fp.loc, panel: fp && fp.panel, letter: exitSide.term, port: exitPort, fiber: outF}; break; }
+    hops.end = {kind:"O", label: exitSide.other || "Not set", fiber: outF};
     break;
   }
   return hops;
+}
+function portOnSide(sp, side, f){
+  const row = sp.rows.find(r => parseInt(side === "a" ? r.af : r.bf, 10) === f);
+  const typed = row ? portNum(side === "a" ? row.ap : row.bp) : null;
+  if (typed) return typed;
+  const s = sp[side]; if (!s.term) return null;
+  const rr = resolveSide(s); return rr.term && f <= rr.term.count ? f : null;
+}
+function dropPort(dr, row){
+  const t = portNum(row.p); if (t) return t;
+  if (!dr.side.term) return null;
+  const rr = resolveSide(dr.side); return rr.term && row.df <= rr.term.count ? row.df : null;
 }
 
 function showTrace(loc, panel, m, port){
@@ -769,10 +1047,11 @@ function showTrace(loc, panel, m, port){
   for (const h of hops) {
     const lv = parseFloat(h.row.l); if (!isNaN(lv)) { loss += lv; lossN++; }
     html += `<div class="tr-arrow">${h.inCable ? esc(h.inCable) + "<br>" : ""}fiber ${h.inF} ${fiberChip(h.inF)}<span>→</span></div>`;
-    html += box("tr-s", `⇄ ${esc(h.sp.name)}`, [esc(h.loc.name) + (h.sp.closure ? " · " + esc(h.sp.closure) : ""), `Tray ${esc(h.row.t || "–")} · ${h.inF} → ${h.outF}`, h.row.l !== "" ? `<span class="${!isNaN(lv) && lv > settings.maxLoss ? "lowlight" : ""}">${esc(h.row.l)} dB</span>` : "", h.row.s && stTag(h.row.s), h.row.n && esc(h.row.n)]);
+    const via = h.drop ? (h.fromDrop ? `⤵ ${esc(h.drop)} f${h.inF} → ${h.outSide} fiber ${h.outF}` : `${h.inSide} fiber ${h.inF} → ⤵ ${esc(h.drop)} f${h.outF}`) : `Tray ${esc(h.row.t || "–")} · ${h.inF} → ${h.outF || "✕"}`;
+    html += box("tr-s", `⇄ ${esc(h.sp.name)}`, [esc(h.loc.name) + (h.sp.closure ? " · " + esc(h.sp.closure) : ""), via, h.row.l !== "" ? `<span class="${!isNaN(lv) && lv > settings.maxLoss ? "lowlight" : ""}">${esc(h.row.l)} dB</span>` : "", h.row.s && stTag(h.row.s), h.row.n && esc(h.row.n)]);
   }
   const e = hops.end;
-  if (hops.length) {
+  if (hops.length && hops[hops.length - 1].outF) {
     const last = hops[hops.length - 1];
     html += `<div class="tr-arrow">${last.outCable ? esc(last.outCable) + "<br>" : ""}fiber ${last.outF} ${fiberChip(last.outF)}<span>→</span></div>`;
   }
@@ -780,11 +1059,88 @@ function showTrace(loc, panel, m, port){
     const tm = e.letter ? e.panel.modules.find(x => x.letter === e.letter) : null, ep = tm && e.port ? tm.ports[e.port - 1] || {} : {};
     html += box("tr-p", `${esc(e.loc.name)} › ${esc(e.panel.name)}`, [tm ? `Terminal ${esc(tm.letter)} · port <b>${e.port || "?"}</b>` : "Panel (no terminal set)", stTag((ep.s || "").toUpperCase()), tm && e.port && tm.circuits[Math.floor((e.port - 1) / 2)] ? "Circuit " + esc(tm.circuits[Math.floor((e.port - 1) / 2)]) : "", ep.l && `${esc(ep.l)} dBm`]);
   } else if (e && e.kind === "O") html += box("tr-o", esc(e.label), ["not in app"]);
+  else if (e && e.kind === "X") html += box("tr-o", "Stops here", [esc(e.label)]);
   else if (!hops.length) html += `<div class="tr-none">No splice record carries this port yet.<br>Add a splice and set one side to <b>${esc(loc.name)} › ${esc(panel.name)} › Terminal ${esc(m.letter)}</b>.</div>`;
   else html += box("tr-o", "Route continues…", ["next splice/panel not set"]);
   $("#trBody").innerHTML = `<div class="tr-chain">${html}</div>${hops.length ? `<p class="note" style="margin-top:12px">${hops.length} splice${hops.length === 1 ? "" : "s"} · total splice loss ${lossN ? loss.toFixed(3) + " dB" : "not recorded"}${lossN && lossN < hops.length ? ` (${lossN} of ${hops.length} recorded)` : ""}</p>` : ""}`;
   $("#trTitle").textContent = `Fiber trace — ${panel.name} ${m.letter}-${port}`;
   $("#dlgTrace").showModal();
+}
+
+/* ================= OTDR inbox ================= */
+let inboxFiles = [], inboxLoc = null;
+function fiberFromName(n){
+  const base = String(n || "").replace(/\.[^.]+$/, "");
+  let m = base.match(/(?:fib(?:er|re)?|core|ch|port|f)[\s_\-#.]*0*(\d{1,3})(?!\d)/i);
+  if (!m) m = base.match(/(?:^|[^\d])0*(\d{1,3})(?:[_\-\s]?(?:1310|1550|1625|1490|850|1300))?\s*$/);
+  return m ? String(+m[1]) : "";
+}
+function inboxRowHTML(f, i){
+  const isImg = /^image\//.test(f.type), cat = guessCat({name: f.name, type: f.type || ""});
+  return `<tr>
+    <td><input type="checkbox" data-ib="${i}" checked></td>
+    <td><div style="font-weight:700;word-break:break-all">${esc(f.name)}</div><div class="note">${fmtSize(f.size || 0)} · ${new Date(f.created).toLocaleString()}${f.note ? " · " + esc(f.note) : ""}</div></td>
+    <td><span class="cat">${CATS[cat] || cat}</span></td>
+    <td><input data-ibtag="${i}" value="${esc(fiberFromName(f.name))}" placeholder="fiber/port" style="width:80px;padding:6px;border:1px solid var(--line);border-radius:6px"></td>
+    <td><a href="${esc(f.url)}" target="_blank" class="linkbtn">${isImg ? "View" : "Open"}</a></td>
+  </tr>`;
+}
+function inboxTargetsHTML(loc){
+  if (!loc) return `<option value="">Whole location</option>`;
+  return `<option value="">Whole location</option>${loc.panels.length ? `<optgroup label="Panels">${loc.panels.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("")}</optgroup>` : ""}${(loc.splices || []).length ? `<optgroup label="Splices">${loc.splices.map(s => `<option value="${s.id}" ${route.sec === "splices" && loc.splices[route.sp] === s ? "selected" : ""}>⇄ ${esc(s.name)}</option>`).join("")}</optgroup>` : ""}`;
+}
+async function openInbox(loc){
+  if (!settings.url) return toast("Connect the Google Sheet in ⚙ first");
+  inboxLoc = loc || null;
+  const locs = locations.filter(l => !l.deleted).sort((a, b) => a.name.localeCompare(b.name));
+  $("#ibLoc").innerHTML = `<option value="">— choose location —</option>` + locs.map(l => `<option value="${l.id}" ${inboxLoc && inboxLoc.id === l.id ? "selected" : ""}>${esc(l.name)}</option>`).join("");
+  $("#ibTarget").innerHTML = inboxTargetsHTML(inboxLoc);
+  $("#ibBody").innerHTML = `<div class="note">Checking the inbox…</div>`;
+  $("#dlgInbox").showModal();
+  await refreshInbox();
+}
+async function refreshInbox(){
+  try {
+    const j = await api("inboxList");
+    inboxFiles = j.files || []; $("#ibFolder").dataset.url = j.folderUrl || "";
+    updateInboxBadge();
+    $("#ibBody").innerHTML = inboxFiles.length ? `<div class="scroll"><table class="dash" style="font-size:13px"><tr><th><input type="checkbox" id="ibAll" checked></th><th style="text-align:left">File</th><th>Type</th><th>Fiber / port</th><th></th></tr>${inboxFiles.map(inboxRowHTML).join("")}</table></div>`
+      : `<div class="empty">Inbox is empty.<br><span class="note">Upload from the MaxTester at <b>${esc(location.origin)}/otdr</b>, or drop files in the OTDR Inbox Drive folder.</span></div>`;
+    const all = $("#ibAll"); if (all) all.onchange = () => document.querySelectorAll("[data-ib]").forEach(c => c.checked = all.checked);
+  } catch (e) { $("#ibBody").innerHTML = `<div class="tr-none">Couldn't reach the inbox: ${esc(e.message)}<br>Check you're online and the Apps Script is updated to the latest Code.gs.</div>`; }
+}
+function updateInboxBadge(){ const b = $("#btnInbox"); if (b) b.textContent = inboxFiles.length ? `📥 ${inboxFiles.length}` : "📥"; }
+const selectedInbox = () => [...document.querySelectorAll("[data-ib]")].filter(c => c.checked).map(c => +c.dataset.ib);
+async function assignInbox(){
+  const locId = $("#ibLoc").value; if (!locId) return toast("Choose a location first");
+  const loc = locations.find(l => l.id === locId); if (!loc) return;
+  const target = $("#ibTarget").value, catSel = $("#ibCat").value;
+  const picks = selectedInbox(); if (!picks.length) return toast("Select at least one file");
+  const btn = $("#ibAssign"); btn.disabled = true;
+  let n = 0;
+  try {
+    for (const i of picks) {
+      const f = inboxFiles[i]; if (!f) continue;
+      btn.textContent = `Assigning ${n + 1}/${picks.length}…`;
+      const tag = (document.querySelector(`[data-ibtag="${i}"]`) || {}).value || "";
+      const r = await api("inboxClaim", {driveId: f.driveId, locationId: loc.id, locationName: loc.name});
+      loc.attachments = loc.attachments || [];
+      loc.attachments.push({id: uid(), name: f.name, type: r.type || f.type || "application/octet-stream", size: r.size || f.size || 0,
+        cat: catSel === "auto" ? guessCat({name: f.name, type: f.type || ""}) : catSel, panelId: target, tag: tag.trim(),
+        addedAt: now(), by: settings.tech || "", driveId: r.driveId, url: r.url, note: f.note || ""});
+      n++;
+    }
+  } catch (e) { toast("Stopped: " + e.message); }
+  btn.disabled = false; btn.textContent = "Assign selected";
+  if (n) { await touch(loc); toast(`${n} file(s) added to ${loc.name}`); }
+  await refreshInbox();
+  if (route.view === "loc" && route.id === loc.id) render();
+}
+async function deleteInbox(){
+  const picks = selectedInbox(); if (!picks.length) return toast("Select files to delete");
+  if (!confirm(`Move ${picks.length} file(s) from the inbox to the Drive trash?`)) return;
+  for (const i of picks) { try { await api("inboxDelete", {driveId: inboxFiles[i].driveId}); } catch (e) { toast(e.message); break; } }
+  await refreshInbox();
 }
 
 /* ================= rendering ================= */
@@ -809,7 +1165,7 @@ function navClick(e){
   if (s2) { route = {...route, view:"loc", id: s2.dataset.golsp, sec:"splices", sp: +s2.dataset.spidx}; render(); scrollTo(0, 0); return true; }
   return false;
 }
-function killMaps(){ if (homeMap) { homeMap.remove(); homeMap = null; } if (locMap) { locMap.remove(); locMap = null; } }
+function killMaps(){ if (homeMap) { homeMap.remove(); homeMap = null; } if (locMap) { locMap.remove(); locMap = null; } if (typeof spMap !== "undefined" && spMap) { spMap.remove(); spMap = null; } }
 const hasGeo = l => l.lat !== "" && l.lng !== "" && !isNaN(parseFloat(l.lat)) && !isNaN(parseFloat(l.lng));
 const tiles = () => L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:"© OpenStreetMap"});
 const pinIcon = color => L.divIcon({className:"", iconSize:[22,22], iconAnchor:[11,11],
@@ -835,7 +1191,7 @@ function renderHome(){
       <div class="seg"><button data-mode="list" class="${mode === "list" ? "on" : ""}">List</button><button data-mode="map" class="${mode === "map" ? "on" : ""}">Map</button><button data-mode="wire" class="${mode === "wire" ? "on" : ""}">Wire map</button></div>
       <input class="search grow" id="q" placeholder="Search locations, addresses, system IDs…" value="${esc(route.q || "")}">
     </div>
-    ${mode === "wire" ? wireMapSVG(q ? homeFocus(q) : null) : mode === "map" ? `<div id="homeMap" class="map bigmap"></div><p class="note">${shown.filter(([l]) => hasGeo(l)).length} of ${shown.length} locations have a GPS pin. Red = has damaged ports.</p>` : `
+    ${mode === "wire" ? wireMapSVG(q ? homeFocus(q) : null) : mode === "map" ? `<div id="homeMap" class="map bigmap"></div><p class="note">${shown.filter(([l]) => hasGeo(l)).length} of ${shown.length} locations have a GPS pin. Circle = location (red = damaged ports) · teal diamond = splice case.</p>` : `
     <div class="legend">${STATUSES.map(s => `<span class="st-${s}">${s}</span>`).join("")}<span style="background:#eee;color:#555">OPEN = no status</span></div>
     <div id="list">${shown.length ? shown.map(([l, st]) => `
       <div class="card" data-id="${l.id}">
@@ -860,8 +1216,14 @@ function renderHome(){
       L.marker(ll, {icon: pinIcon(st.DAMAGED ? "#C8102E" : "#1F2A5C")}).addTo(homeMap)
         .bindPopup(`<b>${esc(l.name)}</b><br>${esc(l.address)}<br>${st.inUse}/${st.total} in use${st.DAMAGED ? ` · ${st.DAMAGED} damaged` : ""}<br><a href="#" data-open="${l.id}">Open →</a>`);
     }
+    for (const [l] of shown) (l.splices || []).forEach((sp, i) => {
+      const la = parseFloat(sp.lat), ln = parseFloat(sp.lng); if (isNaN(la) || isNaN(ln)) return;
+      pts.push([la, ln]);
+      L.marker([la, ln], {icon: L.divIcon({className:"", iconSize:[18,18], iconAnchor:[9,9], html:`<div style="width:18px;height:18px;transform:rotate(45deg);background:#007A99;border:3px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>`})}).addTo(homeMap)
+        .bindPopup(`<b>⇄ ${esc(sp.name)}</b><br>${esc(l.name)}${sp.closure ? " · " + esc(sp.closure) : ""}${(sp.drops || []).length ? `<br>${sp.drops.length} drop(s)` : ""}<br><a href="#" data-golsp="${l.id}" data-spidx="${i}">Open →</a>`);
+    });
     if (pts.length) homeMap.fitBounds(pts, {padding:[40,40], maxZoom:16});
-    $("#homeMap").addEventListener("click", e => { const a = e.target.closest("[data-open]"); if (a) { e.preventDefault(); open(a.dataset.open); } });
+    $("#homeMap").addEventListener("click", e => { const a = e.target.closest("[data-open]"); if (a) { e.preventDefault(); open(a.dataset.open); } const b = e.target.closest("[data-golsp]"); if (b) { e.preventDefault(); navClick(e); } });
   } else $("#homeMap").innerHTML = `<div class="empty">Map needs an internet connection.</div>`;
 }
 
@@ -943,6 +1305,7 @@ function renderLocation(loc){
         <select id="upCat"><option value="auto">Type: auto-detect</option>${Object.entries(CATS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
         <select id="upPanel"><option value="">Whole location</option>${loc.panels.map((x, i) => `<option value="${x.id}" ${i === pi && route.sec !== "splices" ? "selected" : ""}>${esc(x.name)}</option>`).join("")}${loc.splices.map((x, i) => `<option value="${x.id}" ${route.sec === "splices" && i === route.sp ? "selected" : ""}>Splice: ${esc(x.name)}</option>`).join("")}</select>
         <label class="btn cyan" style="margin:0">📷 Take photo<input type="file" id="upCam" accept="image/*" capture="environment" hidden></label>
+        <button class="btn" id="upInbox">📥 From OTDR inbox</button>
         <label class="btn primary" style="margin:0">⬆ Add files<input type="file" id="upFiles" multiple hidden accept="image/*,.pdf,.sor,.trc,.msor,.kml,.kmz,.csv,.txt"></label>
       </div>
       <div class="row" style="margin-bottom:10px" id="attFilter">
@@ -955,6 +1318,19 @@ function renderLocation(loc){
   hydrateThumbs(loc);
 }
 
+async function addFilesTo(loc, files, panelId, catSel){
+  let n = 0;
+  for (let f of files) {
+    if (f.size > 45e6) { toast(`${f.name} is over 45 MB, skipped`); continue; }
+    const cat = catSel === "auto" ? guessCat(f) : catSel;
+    if (cat === "photo") f = await shrinkImage(f);
+    const a = {id: uid(), name: f.name, type: f.type || "application/octet-stream", size: f.size, cat, panelId: panelId || "", addedAt: now(), by: settings.tech || ""};
+    await DB.putFile({id: a.id, locId: loc.id, blob: f});
+    loc.attachments = loc.attachments || []; loc.attachments.push(a); n++;
+  }
+  if (n) { await touch(loc); toast(`${n} file(s) added`); render(); }
+}
+
 function attListHTML(loc){
   const af = route.af || "all";
   const list = loc.attachments.filter(a => af === "all" || a.cat === af).sort((a, b) => (b.addedAt || "").localeCompare(a.addedAt || ""));
@@ -963,7 +1339,7 @@ function attListHTML(loc){
     const pn = a.panelId ? (loc.panels.find(x => x.id === a.panelId) || (loc.splices || []).find(x => x.id === a.panelId) || {}).name || "Removed" : "Location";
     return `<div class="att">
       <div class="thumb" data-view="${a.id}" data-thumb="${a.id}">${a.type && a.type.startsWith("image/") ? "" : extOf(a.name)}</div>
-      <div class="meta"><b title="${esc(a.name)}">${esc(a.name)}</b><span class="cat">${CATS[a.cat] || a.cat}</span> ${esc(pn)}<br>${fmtSize(a.size || 0)} · ${a.driveId ? "in Drive" : `<span class="pending">waiting to upload</span>`}</div>
+      <div class="meta"><b title="${esc(a.name)}">${esc(a.name)}</b><span class="cat">${CATS[a.cat] || a.cat}</span> ${esc(pn)}${a.tag ? ` · <b>${esc(a.tag)}</b>` : ""}<br>${fmtSize(a.size || 0)} · ${a.driveId ? "in Drive" : `<span class="pending">waiting to upload</span>`}</div>
       <div class="acts"><button data-view="${a.id}">Open</button><button data-delatt="${a.id}">Delete</button></div>
     </div>`;
   }).join("");
@@ -972,11 +1348,11 @@ function attListHTML(loc){
 async function hydrateThumbs(loc){
   for (const a of loc.attachments) {
     if (!a.type || !a.type.startsWith("image/")) continue;
-    const el = document.querySelector(`[data-thumb="${a.id}"]`); if (!el) continue;
+    const els = document.querySelectorAll(`[data-thumb="${a.id}"]`); if (!els.length) continue;
     let url = thumbUrls.get(a.id);
     if (!url) { const f = await DB.getFile(a.id); if (f && f.blob) { url = URL.createObjectURL(f.blob); thumbUrls.set(a.id, url); } }
     if (!url && a.driveId) url = `https://drive.google.com/thumbnail?id=${a.driveId}&sz=w400`;
-    if (url) el.style.backgroundImage = `url("${url}")`;
+    if (url) els.forEach(el => el.style.backgroundImage = `url("${url}")`);
   }
 }
 
@@ -1081,7 +1457,8 @@ function bindLocation(loc, p){
   }
   // attachments
   document.querySelectorAll("[data-af]").forEach(b => b.onclick = () => { route.af = b.dataset.af; render(); });
-  const addFiles = async files => {
+  const addFiles = files => addFilesTo(loc, files, $("#upPanel").value, $("#upCat").value);
+  const addFilesOld = async files => {
     const catSel = $("#upCat").value, panelId = $("#upPanel").value;
     let n = 0;
     for (let f of files) {
@@ -1094,6 +1471,7 @@ function bindLocation(loc, p){
     }
     if (n) { await touch(loc); toast(`${n} file(s) added`); render(); }
   };
+  $("#upInbox").onclick = () => openInbox(loc);
   $("#upFiles").onchange = e => { addFiles([...e.target.files]); e.target.value = ""; };
   $("#upCam").onchange = e => { addFiles([...e.target.files]); e.target.value = ""; };
   $("#atts").onclick = async e => {
@@ -1226,6 +1604,7 @@ async function sync(manual){
     locations = locations.filter(x => !(x.deleted && !x.dirty));
     await DB.setMeta("lastSync", now());
     setChip("Synced", "ok");
+    api("inboxList").then(j => { inboxFiles = j.files || []; updateInboxBadge(); }).catch(() => {});
     if (manual) toast(`Synced · ${pushed} sent, ${pulled} received`);
     if (pulled && !isEditing()) render();
   } catch (e) {
@@ -1255,12 +1634,20 @@ function openTermDialog(letter, title, cb, count = 12, conn = "LC"){
   f.querySelector(`[name=tconn][value="${conn}"]`).checked = true;
   termCb = cb; $("#dlgTerm").showModal();
 }
+$("#dlgTap").addEventListener("close", () => { if ($("#dlgTap").returnValue === "ok") applyTap(); else tapCtx = null; });
 $("#dlgTerm").addEventListener("close", () => {
   if ($("#dlgTerm").returnValue !== "ok" || !termCb) return;
   const f = new FormData($("#formTerm"));
   const letter = String(f.get("letter") || "").trim().toUpperCase(); if (!letter) return;
   termCb(letter, +f.get("tcount") || 12, f.get("tconn") || "LC"); termCb = null;
 });
+$("#btnInbox").onclick = () => openInbox(route.view === "loc" ? locations.find(l => l.id === route.id) : null);
+$("#ibRefresh").onclick = () => refreshInbox();
+$("#ibAssign").onclick = () => assignInbox();
+$("#ibDelete").onclick = () => deleteInbox();
+$("#ibFolder").onclick = () => { const u = $("#ibFolder").dataset.url; if (u) window.open(u, "_blank"); };
+$("#ibLoc").onchange = () => { $("#ibTarget").innerHTML = inboxTargetsHTML(locations.find(l => l.id === $("#ibLoc").value)); };
+$("#ibUrl").textContent = location.origin + "/otdr"; $("#setOtdrUrl").textContent = location.origin + "/otdr";
 $("#btnSettings").onclick = () => {
   $("#setUrl").value = settings.url; $("#setKey").value = settings.key; $("#setTech").value = settings.tech; $("#setLow").value = settings.low; $("#setLoss").value = settings.maxLoss;
   $("#dlgSettings").showModal();
