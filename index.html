@@ -167,6 +167,7 @@ tr.droprow td{background:#FAF7FD}
 @media(max-width:900px){.dropbody{grid-template-columns:1fr}}
 .side-d{border-top-color:#7B3FA0}.side-d h3{color:#7B3FA0}
 table.splice tr.sh th.sd{background:#7B3FA0}
+.fileinp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
 .upl select{padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
 @media print{
   @page{size:letter portrait;margin:.4in}
@@ -282,7 +283,7 @@ table.splice tr.sh th.sd{background:#7B3FA0}
     <button class="btn cyan" id="btnSyncNow">Sync now</button>
     <button class="btn" id="btnOpenSheet">Open Sheet</button>
     <button class="btn" id="btnExport">Backup (JSON)</button>
-    <label class="btn" style="margin:0">Restore<input type="file" id="fileImport" accept=".json" hidden></label>
+    <button type="button" class="btn" data-pick="fileImport">Restore</button><input type="file" id="fileImport" accept=".json" class="fileinp" tabindex="-1" aria-hidden="true">
   </div>
   <div class="row" style="justify-content:flex-end;margin-top:14px">
     <button class="btn primary" id="btnSaveSettings">Save</button>
@@ -620,9 +621,9 @@ function spliceSectionHTML(loc){
       <div class="row noprint" style="margin:10px 0 8px">
         <button class="btn cyan" id="spGps">📍 Log GPS here</button>
         <button class="btn" id="spGmaps" ${geo ? "" : "disabled"}>Open in Google Maps</button>
-        <label class="btn primary" style="margin:0">📷 Photo<input type="file" id="spCam" accept="image/*" capture="environment" hidden></label>
+        <button type="button" class="btn primary" data-pick="spCam">📷 Photo</button><input type="file" id="spCam" accept="image/*" capture="environment" class="fileinp" tabindex="-1" aria-hidden="true">
         <button class="btn" id="spInbox">📥 OTDR inbox</button>
-        <label class="btn" style="margin:0">⬆ Files (OTDR, PDF)<input type="file" id="spFiles" multiple hidden accept="image/*,.pdf,.sor,.trc,.msor,.kml,.kmz,.csv,.txt"></label>
+        <button type="button" class="btn" data-pick="spFiles">⬆ Files (OTDR, PDF)</button><input type="file" id="spFiles" multiple class="fileinp" tabindex="-1" aria-hidden="true">
         <span class="note">Tap the map to set or move the splice-case pin.</span>
       </div>
       <div id="spMap" class="map noprint" style="height:220px"></div>
@@ -1206,7 +1207,7 @@ function renderHome(){
   $("#q").oninput = e => { route.q = e.target.value; const pos = e.target.selectionStart; renderHome(); const el = $("#q"); el.focus(); el.setSelectionRange(pos, pos); };
   document.querySelectorAll(".seg button").forEach(b => b.onclick = () => { route.mode = b.dataset.mode; renderHome(); });
   const open = id => { route = {view:"loc", id, panel:0, q: route.q, mode: route.mode}; render(); scrollTo(0,0); };
-  if (mode === "wire") $("#app").onclick = navClick;
+  if (mode === "wire") $("#app").onclick = e => { navClick(e); };
   else if (mode === "list") $("#list").onclick = e => { const c = e.target.closest(".card"); if (c) open(c.dataset.id); };
   else if (window.L) {
     homeMap = L.map("homeMap").setView([32.7357, -97.1081], 12); tiles().addTo(homeMap);
@@ -1304,9 +1305,9 @@ function renderLocation(loc){
       <div class="upl">
         <select id="upCat"><option value="auto">Type: auto-detect</option>${Object.entries(CATS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
         <select id="upPanel"><option value="">Whole location</option>${loc.panels.map((x, i) => `<option value="${x.id}" ${i === pi && route.sec !== "splices" ? "selected" : ""}>${esc(x.name)}</option>`).join("")}${loc.splices.map((x, i) => `<option value="${x.id}" ${route.sec === "splices" && i === route.sp ? "selected" : ""}>Splice: ${esc(x.name)}</option>`).join("")}</select>
-        <label class="btn cyan" style="margin:0">📷 Take photo<input type="file" id="upCam" accept="image/*" capture="environment" hidden></label>
+        <button type="button" class="btn cyan" data-pick="upCam">📷 Take photo</button><input type="file" id="upCam" accept="image/*" capture="environment" class="fileinp" tabindex="-1" aria-hidden="true">
         <button class="btn" id="upInbox">📥 From OTDR inbox</button>
-        <label class="btn primary" style="margin:0">⬆ Add files<input type="file" id="upFiles" multiple hidden accept="image/*,.pdf,.sor,.trc,.msor,.kml,.kmz,.csv,.txt"></label>
+        <button type="button" class="btn primary" data-pick="upFiles">⬆ Add files</button><input type="file" id="upFiles" multiple class="fileinp" tabindex="-1" aria-hidden="true">
       </div>
       <div class="row" style="margin-bottom:10px" id="attFilter">
         ${["all", ...Object.keys(CATS)].map(k => `<button class="tab ${ (route.af || "all") === k ? "on" : ""}" data-af="${k}">${k === "all" ? "All" : CATS[k]} (${k === "all" ? loc.attachments.length : loc.attachments.filter(a => a.cat === k).length})</button>`).join("")}
@@ -1419,7 +1420,7 @@ function bindLocation(loc, p){
     loc.deleted = true; await touch(loc); route = {view:"home"}; render(); toast("Location deleted");
   };
   document.querySelectorAll("[data-sec]").forEach(b => b.onclick = () => { route.sec = b.dataset.sec; render(); });
-  $("#app").onclick = navClick;
+  $("#app").onclick = e => { navClick(e); };
   if (route.sec === "splices") bindSplices(loc);
   const addP = $("#addPanel");
   if (addP) addP.onclick = () => openTermDialog("A", "New panel — Terminal A", async (letter, count, conn) => {
@@ -1641,6 +1642,8 @@ $("#dlgTerm").addEventListener("close", () => {
   const letter = String(f.get("letter") || "").trim().toUpperCase(); if (!letter) return;
   termCb(letter, +f.get("tcount") || 12, f.get("tconn") || "LC"); termCb = null;
 });
+// file pickers: a real button opens the (off-screen) input, which iPhone Safari requires
+document.addEventListener("click", e => { const b = e.target.closest("[data-pick]"); if (!b) return; const i = document.getElementById(b.dataset.pick); if (i) { i.value = ""; i.click(); } });
 $("#btnInbox").onclick = () => openInbox(route.view === "loc" ? locations.find(l => l.id === route.id) : null);
 $("#ibRefresh").onclick = () => refreshInbox();
 $("#ibAssign").onclick = () => assignInbox();
