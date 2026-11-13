@@ -1,5 +1,5 @@
 // Fiber911 Panel Guide — offline shell cache. Bump VERSION when you upload a new index.html.
-const VERSION = "panels-v1";
+const VERSION = "panels-v3";
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg",
   "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css", "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"];
 

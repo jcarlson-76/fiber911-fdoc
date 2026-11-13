@@ -53,7 +53,7 @@ main{max-width:1100px;margin:0 auto;padding:14px 14px 100px}
 .sect h2{margin:0 0 10px;font-size:13px;color:var(--navy);text-transform:uppercase;letter-spacing:.5px}
 .fields{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .fields label{display:flex;flex-direction:column;font-size:10px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
-.fields input,.fields textarea{margin-top:3px;padding:8px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:14px;font-weight:400;text-transform:none;letter-spacing:0}
+.fields input,.fields textarea,.fields select{margin-top:3px;padding:8px 9px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:14px;font-weight:400;text-transform:none;letter-spacing:0}
 .fields .span2{grid-column:span 2}.fields .span4{grid-column:1/-1}
 @media(max-width:700px){.fields{grid-template-columns:repeat(2,1fr)}.fields .span4,.fields .span2{grid-column:1/-1}}
 .tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:10px;padding-bottom:2px}
@@ -119,6 +119,41 @@ table.dash td:first-child{text-align:left;font-weight:700;color:var(--navy)}
 .pick input:checked+b{background:var(--navy);color:#fff}
 .modhead .x{background:transparent;border:0;color:#fff;font-size:18px;padding:0 12px;cursor:pointer;align-self:stretch}
 .modhead .x:hover{background:var(--red)}
+.fc{display:inline-block;font-size:9px;font-weight:800;padding:1px 3px;border-radius:3px;margin-left:3px;border:1px solid rgba(0,0,0,.25);line-height:1.3}
+.sides{display:grid;grid-template-columns:1fr 34px 1fr;gap:8px;align-items:stretch;margin-bottom:6px}
+.side{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;border-top:5px solid var(--navy)}
+.side-b{border-top-color:var(--red)}
+.side h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--navy)}
+.side-b h3{color:var(--red)}
+.side select{margin-top:3px;padding:8px;border:1px solid var(--line);border-radius:7px;background:#fff;font-size:14px;font-weight:400;text-transform:none;letter-spacing:0}
+.sidearrow{display:grid;place-items:center;font-size:26px;color:var(--navy);font-weight:900}
+@media(max-width:760px){.sides{grid-template-columns:1fr}.sidearrow{transform:rotate(90deg);height:24px}}
+.linkbtn{background:none;border:0;color:var(--cyan);font-weight:700;cursor:pointer;padding:6px 0 0;font-size:13px}
+table.splice{min-width:760px}
+table.splice tr.sh th{background:var(--navy);color:#fff;font-size:10px;text-transform:uppercase;height:28px}
+table.splice tr.sh th.sa{background:#2E3E7E}table.splice tr.sh th.sb{background:var(--red)}
+table.splice td.arrow{color:var(--mute);font-weight:900;background:var(--light)}
+table.splice td.fnum{white-space:nowrap;font-size:13px;padding:0 4px}
+table.splice td.fnum input{display:inline-block;width:42px;height:28px;border:1px solid var(--line);border-radius:4px}
+.spbadge{background:var(--cyan);border:0;color:#fff;font-weight:700;border-radius:99px;font-size:11px;padding:3px 9px;margin-right:4px;cursor:pointer;white-space:nowrap}
+.spbadge:hover{background:#0090c8}
+.wm-wrap{overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;max-height:calc(100vh - 230px);min-height:260px}
+.wm text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wm-t{font-size:13px;font-weight:800;fill:#1F2A5C}.wm-s{font-size:11px;fill:#333}.wm-s2{font-size:10px;fill:#5d6680}
+.wm-el{font-size:10.5px;font-weight:700;fill:#1F2A5C;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.wm-el2{font-size:10px;fill:#5d6680;paint-order:stroke;stroke:#fff;stroke-width:4px}
+.wm-n{cursor:pointer}.wm-n:hover rect:first-child{filter:drop-shadow(0 2px 6px rgba(0,174,239,.6))}
+th.port{cursor:pointer}th.port:hover{outline:3px solid var(--cyan);outline-offset:-3px}
+#dlgTrace{width:min(1100px,96vw)}
+.tr-chain{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 2px 10px}
+.tr-box{min-width:170px;max-width:220px;border:2px solid var(--navy);border-radius:10px;padding:9px 10px;font-size:12px;line-height:1.45;background:#fff;flex:none}
+.tr-box b{display:block;font-size:13px;color:var(--navy);margin-bottom:3px}
+.tr-s{border-color:#007A99;background:#E6F6FA;border-radius:22px}.tr-s b{color:#005F78}
+.tr-o{border-style:dashed;border-color:#999;background:#f4f4f4}
+.tr-arrow{flex:none;min-width:96px;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:10.5px;color:var(--mute);text-align:center;padding:0 4px}
+.tr-arrow span{font-size:22px;color:var(--navy);font-weight:900;line-height:1}
+.tr-none{padding:16px;color:var(--mute);font-size:13px;align-self:center}
+@media(max-width:700px){.tr-chain{flex-direction:column;align-items:stretch}.tr-box{max-width:none}.tr-arrow{flex-direction:row;gap:8px;padding:4px 0}.tr-arrow span{transform:rotate(90deg)}}
 .upl select{padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
 @media print{
   @page{size:letter portrait;margin:.4in}
@@ -178,6 +213,11 @@ table.dash td:first-child{text-align:left;font-weight:700;color:var(--navy)}
   </div>
 </form></dialog>
 
+<dialog id="dlgTrace"><div class="dlg">
+  <div class="row"><h2 id="trTitle" class="grow" style="margin:0">Fiber trace</h2><button class="btn" onclick="this.closest('dialog').close()">Close</button></div>
+  <div id="trBody" style="margin-top:12px"></div>
+</div></dialog>
+
 <dialog id="dlgSettings"><div class="dlg">
   <h2>Settings &amp; sync</h2>
   <div class="fields">
@@ -185,6 +225,7 @@ table.dash td:first-child{text-align:left;font-weight:700;color:var(--navy)}
     <label>Sync key<input id="setKey" placeholder="from the Setup step in the Sheet"></label>
     <label>Tech name (default for new panels)<input id="setTech"></label>
     <label>Low-light threshold (dBm)<input id="setLow" type="number" step="0.1"></label>
+    <label>Max splice loss (dB)<input id="setLoss" type="number" step="0.01"></label>
   </div>
   <p class="note">Data is saved on this device first, then synced to the shared Google Sheet. Each location becomes its own tab in the Sheet.</p>
   <div class="row" style="margin-top:8px">
@@ -251,11 +292,26 @@ const DB = (() => {
 })();
 
 /* ================= model ================= */
+const localDate = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10); };
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 const now = () => new Date().toISOString();
 const blankPort = () => ({s:"",p:"",l:"",d:""});
 function newModule(i, count = 12, conn = "LC"){
   return {letter: LETTERS[i] || String(i+1), to:"", count, conn, ports: Array.from({length:count}, blankPort), circuits: Array(count / 2).fill("")};
+}
+// bring records from earlier builds up to the current shape (terminal size/connector, splices, files)
+function upgradeLoc(l){
+  if (!l || typeof l !== "object") return l;
+  l.panels = l.panels || []; l.splices = l.splices || []; l.attachments = l.attachments || [];
+  if (l.lat === undefined) l.lat = ""; if (l.lng === undefined) l.lng = "";
+  for (const p of l.panels) for (const m of p.modules || []) {
+    if (!m.count) m.count = (m.ports || []).length > 12 ? 24 : 12;
+    if (!m.conn) m.conn = "LC";
+    m.ports = m.ports || []; while (m.ports.length < m.count) m.ports.push({s:"",p:"",l:"",d:""});
+    m.circuits = m.circuits || []; while (m.circuits.length < m.count / 2) m.circuits.push("");
+  }
+  for (const sp of l.splices) { sp.a = {...blankSide(), ...(sp.a || {})}; sp.b = {...blankSide(), ...(sp.b || {})}; sp.rows = sp.rows || []; }
+  return l;
 }
 function resizeModule(m, count){
   while (m.ports.length < count) m.ports.push(blankPort());
@@ -267,10 +323,10 @@ function resizeModule(m, count){
 const portTotal = p => p.modules.reduce((a, m) => a + m.ports.length, 0);
 function newPanel(n, qty = 1, count = 12, conn = "LC"){
   return {id: uid(), name: "Panel " + n, systemId:"", module:"", datt:"", type:"",
-    date: new Date().toISOString().slice(0,10), tech: settings.tech || "", modules: Array.from({length: qty}, (_, i) => newModule(i, count, conn))};
+    date: localDate(), tech: settings.tech || "", modules: Array.from({length: qty}, (_, i) => newModule(i, count, conn))};
 }
 function newLocation(name, address, qty, count, conn){
-  return {id: uid(), name, address: address || "", notes:"", lat:"", lng:"", panels:[newPanel(1, qty, count, conn)], attachments:[], updatedAt: now(), dirty: true};
+  return {id: uid(), name, address: address || "", notes:"", lat:"", lng:"", panels:[newPanel(1, qty, count, conn)], splices:[], attachments:[], updatedAt: now(), dirty: true};
 }
 const nextLetter = p => LETTERS.split("").find(c => !p.modules.some(m => m.letter === c)) || String(p.modules.length + 1);
 const CATS = {photo:"Panel photo", otdr:"OTDR trace", gis:"GIS map", pdf:"Document"};
@@ -313,11 +369,423 @@ function statsOf(loc){
 
 /* ================= state ================= */
 let locations = [];
-let settings = {url:"", key:"", tech:"", low:-25};
+let settings = {url:"", key:"", tech:"", low:-25, maxLoss:0.15};
 let route = {view:"home"};
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 2200); }
+
+/* ================= splices ================= */
+const SPL_ST = ["SPLICED","PASS","SPARE","CUT","BAD"];
+const SPL_COLORS = {SPLICED:["#C6EFCE","#006100"], PASS:["#DDEBF7","#1F4E78"], SPARE:["#EDEDED","#404040"], CUT:["#D9D9D9","#262626"], BAD:["#FFC7CE","#9C0006"]};
+const FIBER_COUNTS = [6,12,24,36,48,72,96,144,216,288,432];
+const blankSide = () => ({loc:"", panel:"", term:"", spl:"", other:"", cable:""});
+const mkRow = (i, per = 12) => ({t: String(Math.ceil(i / per)), af: i, ap:"", bf: i, bp:"", l:"", s:"", n:""});
+function newSplice(n){
+  return {id: uid(), name: "Splice " + n, closure:"", method:"Fusion", date: localDate(), tech: settings.tech || "",
+    fibers: 12, perTray: 12, a: blankSide(), b: blankSide(), rows: Array.from({length:12}, (_, i) => mkRow(i + 1))};
+}
+function resizeSplice(sp, n){
+  const per = +sp.perTray || 12;
+  while (sp.rows.length < n) sp.rows.push(mkRow(sp.rows.length + 1, per));
+  sp.rows.length = n; sp.fibers = n;
+}
+const tubeOf = f => Math.ceil(f / 12);
+function fiberChip(f){
+  f = parseInt(f, 10); if (!f || f < 1) return "";
+  const t = TIA[(tubeOf(f) - 1) % 12], c = TIA[(f - 1) % 12];
+  return `<span class="fc" title="Tube ${tubeOf(f)} (${t[0]})" style="background:${t[1]};color:${t[2]}">${t[0]}</span><span class="fc" title="Fiber ${((f - 1) % 12) + 1} (${c[0]})" style="background:${c[1]};color:${c[2]}">${c[0]}</span>`;
+}
+function resolveSide(s){
+  const loc = s.loc ? locations.find(l => l.id === s.loc && !l.deleted) : null;
+  const panel = loc ? loc.panels.find(p => p.id === s.panel) : null;
+  const term = panel && s.term ? panel.modules.find(m => m.letter === s.term) : null;
+  const spl = loc && s.spl ? (loc.splices || []).find(x => x.id === s.spl) : null;
+  return {loc, panel, term, spl};
+}
+function sideLabel(s){
+  const r = resolveSide(s);
+  if (!r.loc) return s.other ? esc(s.other) : `<span class="note">not set</span>`;
+  if (r.spl) return `${esc(r.loc.name)} › ⇄ ${esc(r.spl.name)}`;
+  return `${esc(r.loc.name)}${r.panel ? " › " + esc(r.panel.name) : ""}${r.term ? ` › Terminal ${esc(r.term.letter)} (${r.term.count} ${esc(r.term.conn)})` : ""}`;
+}
+// fiber n lands on port n of the chosen terminal (1:1 pigtail), unless a port is typed in
+function derivedPort(s, f){
+  const r = resolveSide(s); f = parseInt(f, 10);
+  if (!r.term || !f || f > r.term.count) return null;
+  const pt = r.term.ports[f - 1] || {};
+  return {label: `${r.term.letter}-${f}`, status: (pt.s || "").toUpperCase(), circuit: r.term.circuits[Math.floor((f - 1) / 2)] || ""};
+}
+// all splices (any location) that land on this panel/terminal
+function splicesFor(panelId, letter){
+  const out = [];
+  for (const l of locations) if (!l.deleted) (l.splices || []).forEach((sp, i) => {
+    for (const side of ["a", "b"]) {
+      const s = sp[side];
+      if (s.panel === panelId && (!s.term || s.term === letter)) out.push({loc: l, sp, idx: i, side: side.toUpperCase()});
+    }
+  });
+  return out;
+}
+
+function sidePickerHTML(sp, side){
+  const s = sp[side], r = resolveSide(s);
+  const locs = locations.filter(l => !l.deleted).sort((a, b) => a.name.localeCompare(b.name));
+  return `<div class="side side-${side}">
+    <h3>${side === "a" ? "Side A — before (upstream)" : "Side B — after (downstream)"}</h3>
+    <div class="fields" style="grid-template-columns:1fr 1fr">
+      <label class="span2">Location<select data-sd="${side}" data-k="loc">
+        <option value="">— Other / not in app —</option>
+        ${locs.map(l => `<option value="${l.id}" ${s.loc === l.id ? "selected" : ""}>${esc(l.name)}</option>`).join("")}
+      </select></label>
+      ${r.loc ? `
+      <label>Panel or splice<select data-sd="${side}" data-k="panel"><option value="">— choose —</option>
+        ${r.loc.panels.length ? `<optgroup label="Panels">${r.loc.panels.map(p => `<option value="${p.id}" ${s.panel === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</optgroup>` : ""}
+        ${(r.loc.splices || []).filter(x => x.id !== sp.id).length ? `<optgroup label="Splices (splice-to-splice)">${r.loc.splices.filter(x => x.id !== sp.id).map(x => `<option value="spl:${x.id}" ${s.spl === x.id ? "selected" : ""}>⇄ ${esc(x.name)}</option>`).join("")}</optgroup>` : ""}
+      </select></label>
+      <label>Terminal<select data-sd="${side}" data-k="term" ${r.panel ? "" : "disabled"}><option value="">— whole panel —</option>
+        ${r.panel ? r.panel.modules.map(m => `<option value="${esc(m.letter)}" ${s.term === m.letter ? "selected" : ""}>Terminal ${esc(m.letter)} · ${m.count} ${esc(m.conn)}</option>`).join("") : ""}</select></label>`
+      : `<label class="span2">Describe<input data-sd="${side}" data-k="other" value="${esc(s.other)}" placeholder="e.g. CO, building MDF, cable stub"></label>`}
+      <label class="span2">Cable ID / count<input data-sd="${side}" data-k="cable" value="${esc(s.cable)}" placeholder="e.g. 144F-ARL-031"></label>
+    </div>
+    ${r.spl ? `<button class="linkbtn noprint" data-golsp="${r.loc.id}" data-spidx="${r.loc.splices.indexOf(r.spl)}">Open ⇄ ${esc(r.spl.name)} →</button>` : r.loc ? `<button class="linkbtn noprint" data-goto="${r.loc.id}" data-gpanel="${r.panel ? r.panel.id : ""}">Open ${esc(r.loc.name)} →</button>` : ""}
+  </div>`;
+}
+
+function spliceRowHTML(sp, r, i){
+  const ad = derivedPort(sp.a, r.af), bd = derivedPort(sp.b, r.bf);
+  const lv = parseFloat(r.l), bad = !isNaN(lv) && lv > settings.maxLoss;
+  const st = SPL_COLORS[r.s];
+  const portCell = (d, val, k) => `<td class="${d && d.status ? "st-" + d.status : ""}" title="${d ? esc((d.status || "no status") + (d.circuit ? " · " + d.circuit : "")) : ""}"><input data-r="${i}" data-k="${k}" value="${esc(val)}" placeholder="${d ? esc(d.label) : ""}"></td>`;
+  return `<tr>
+    <td><input data-r="${i}" data-k="t" value="${esc(r.t)}"></td>
+    <td class="fnum"><b>${r.af}</b>${fiberChip(r.af)}</td>
+    ${portCell(ad, r.ap, "ap")}
+    <td class="arrow">→</td>
+    <td class="fnum"><input data-r="${i}" data-k="bf" value="${esc(r.bf)}" inputmode="numeric" style="width:42px"><span data-bchip="${i}">${fiberChip(r.bf)}</span></td>
+    ${portCell(bd, r.bp, "bp")}
+    <td class="${bad ? "lowlight" : ""}"><input data-r="${i}" data-k="l" value="${esc(r.l)}" inputmode="decimal" class="${bad ? "lowlight" : ""}"></td>
+    <td style="${st ? `background:${st[0]};color:${st[1]}` : ""}"><select data-r="${i}" data-k="s"><option value=""></option>${SPL_ST.map(s => `<option ${r.s === s ? "selected" : ""}>${s}</option>`).join("")}</select></td>
+    <td><input data-r="${i}" data-k="n" value="${esc(r.n)}" style="text-align:left;padding-left:6px"></td>
+  </tr>`;
+}
+
+function spliceSectionHTML(loc){
+  loc.splices = loc.splices || [];
+  if (!loc.splices.length) return `<div class="sect"><div class="empty">No splices at this location yet.<br><br><button class="btn primary" id="addSplice">+ Splice</button></div></div>`;
+  const si = Math.min(route.sp || 0, loc.splices.length - 1); route.sp = si;
+  const sp = loc.splices[si];
+  const done = sp.rows.filter(r => r.s === "SPLICED" || r.s === "PASS").length;
+  const lossVals = sp.rows.map(r => parseFloat(r.l)).filter(v => !isNaN(v));
+  const avg = lossVals.length ? (lossVals.reduce((a, b) => a + b, 0) / lossVals.length).toFixed(3) : "–";
+  const over = lossVals.filter(v => v > settings.maxLoss).length;
+  return `
+    <div class="tabs">
+      ${loc.splices.map((x, i) => `<button class="tab ${i === si ? "on" : ""}" data-spi="${i}">⇄ ${esc(x.name || "Splice " + (i + 1))}</button>`).join("")}
+      <button class="tab" id="addSplice">+ Splice</button>
+    </div>
+    <div class="sect">
+      <h2>Splice</h2>
+      <div class="fields">
+        <label>Splice name<input data-sp="name" value="${esc(sp.name)}"></label>
+        <label>Closure / case ID<input data-sp="closure" value="${esc(sp.closure)}"></label>
+        <label>Date<input type="date" data-sp="date" value="${esc(sp.date)}"></label>
+        <label>Tech<input data-sp="tech" value="${esc(sp.tech)}"></label>
+        <label>Method<select data-sp="method">${["Fusion","Ribbon fusion","Mechanical"].map(m => `<option ${sp.method === m ? "selected" : ""}>${m}</option>`).join("")}</select></label>
+        <label>Fibers<select data-sp="fibers">${[...new Set([...FIBER_COUNTS, sp.fibers])].sort((a, b) => a - b).map(n => `<option value="${n}" ${sp.fibers == n ? "selected" : ""}>${n}</option>`).join("")}</select></label>
+        <label>Fibers per tray<input data-sp="perTray" value="${esc(sp.perTray)}" inputmode="numeric"></label>
+        <label>Progress<input readonly style="background:var(--light)" value="${done}/${sp.rows.length} done · avg ${avg} dB${over ? ` · ${over} over ${settings.maxLoss}` : ""}"></label>
+      </div>
+    </div>
+    <div class="sides">
+      ${sidePickerHTML(sp, "a")}
+      <div class="sidearrow">→</div>
+      ${sidePickerHTML(sp, "b")}
+    </div>
+    <div class="row noprint" style="margin:10px 0">
+      <button class="btn" id="spFill" title="B fiber = A fiber for every row">1:1 fill</button>
+      <button class="btn" id="spTrays">Auto trays</button>
+      <button class="btn" id="spAllDone">Mark all spliced</button>
+      <button class="btn" id="spSwap">Swap A ⇄ B</button>
+      <div class="grow"></div>
+      <button class="btn" id="spDup">Duplicate</button>
+      <button class="btn danger" id="spDel">Delete splice</button>
+    </div>
+    <div class="mod"><div class="scroll"><table class="grid splice">
+      <colgroup><col style="width:56px"><col style="width:110px"><col style="width:90px"><col style="width:28px"><col style="width:130px"><col style="width:90px"><col style="width:80px"><col style="width:96px"><col></colgroup>
+      <tr class="sh"><th>Tray</th><th class="sa">A fiber</th><th class="sa">A port</th><th></th><th class="sb">B fiber</th><th class="sb">B port</th><th>Loss dB</th><th>Status</th><th>Notes</th></tr>
+      ${sp.rows.map((r, i) => spliceRowHTML(sp, r, i)).join("")}
+    </table></div></div>
+    <p class="note">Fiber colors show tube · fiber (TIA-598). Ports fill in automatically when a side is set to a terminal (fiber 1 → port 1); type in a port to override. Loss above ${settings.maxLoss} dB shows red (change in ⚙).</p>`;
+}
+
+function bindSplices(loc){
+  const add = $("#addSplice");
+  if (add) add.onclick = async () => {
+    loc.splices = loc.splices || [];
+    const sp = newSplice(loc.splices.length + 1);
+    if (loc.panels[0]) sp.a = {...blankSide(), loc: loc.id, panel: loc.panels[0].id};
+    loc.splices.push(sp); route.sp = loc.splices.length - 1; await touch(loc); render();
+  };
+  document.querySelectorAll("[data-spi]").forEach(b => b.onclick = () => { route.sp = +b.dataset.spi; render(); });
+  const sp = (loc.splices || [])[route.sp]; if (!sp) return;
+  $("#spFill").onclick = async () => { sp.rows.forEach(r => r.bf = r.af); await touch(loc); render(); };
+  $("#spTrays").onclick = async () => { const per = +sp.perTray || 12; sp.rows.forEach(r => r.t = String(Math.ceil(r.af / per))); await touch(loc); render(); };
+  $("#spAllDone").onclick = async () => { if (!confirm("Set every blank status to SPLICED?")) return; sp.rows.forEach(r => { if (!r.s) r.s = "SPLICED"; }); await touch(loc); render(); };
+  $("#spSwap").onclick = async () => {
+    [sp.a, sp.b] = [sp.b, sp.a];
+    sp.rows.forEach(r => { [r.ap, r.bp] = [r.bp, r.ap]; });
+    await touch(loc); render(); toast("Sides swapped");
+  };
+  $("#spDup").onclick = async () => { const c = JSON.parse(JSON.stringify(sp)); c.id = uid(); c.name += " (copy)"; loc.splices.push(c); route.sp = loc.splices.length - 1; await touch(loc); render(); };
+  $("#spDel").onclick = async () => { if (!confirm(`Delete ${sp.name}?`)) return; loc.splices.splice(route.sp, 1); route.sp = 0; await touch(loc); render(); };
+}
+
+// returns true if handled
+function spliceInput(loc, el, e){
+  const d = el.dataset;
+  const sp = (loc.splices || [])[route.sp];
+  if (!sp || (d.sp === undefined && d.sd === undefined && d.r === undefined)) return false;
+  if (d.sp !== undefined) {
+    if (d.sp === "fibers") {
+      if (e.type !== "change") return true;
+      const n = +el.value;
+      if (n < sp.rows.length && sp.rows.slice(n).some(r => r.l || r.s || r.n || r.ap || r.bp) && !confirm(`Fibers ${n + 1}–${sp.rows.length} have data that will be removed. Continue?`)) { el.value = sp.rows.length; return true; }
+      resizeSplice(sp, n); scheduleSave(loc); render(); return true;
+    }
+    sp[d.sp] = el.value;
+    if (d.sp === "name") { const t = document.querySelector(`.tab[data-spi="${route.sp}"]`); if (t) t.textContent = "⇄ " + (el.value || "Splice"); }
+  } else if (d.sd !== undefined) {
+    const s = sp[d.sd];
+    s[d.k] = el.value;
+    if (d.k === "loc") { s.panel = ""; s.term = ""; s.spl = ""; const l = locations.find(x => x.id === el.value); if (l && l.panels.length === 1 && !(l.splices || []).length) s.panel = l.panels[0].id; }
+    if (d.k === "panel") { s.term = ""; s.spl = ""; if (el.value.startsWith("spl:")) { s.spl = el.value.slice(4); s.panel = ""; } }
+    if (["loc", "panel", "term"].includes(d.k)) { scheduleSave(loc); render(); return true; }
+  } else {
+    const r = sp.rows[+d.r]; if (!r) return true;
+    r[d.k] = el.value;
+    if (d.k === "bf") {
+      const c = document.querySelector(`[data-bchip="${d.r}"]`); if (c) c.innerHTML = fiberChip(el.value);
+      const bp = document.querySelector(`input[data-r="${d.r}"][data-k="bp"]`), dp = derivedPort(sp.b, el.value);
+      if (bp) { bp.placeholder = dp ? dp.label : ""; bp.parentElement.className = dp && dp.status ? "st-" + dp.status : ""; bp.parentElement.title = dp ? (dp.status || "no status") + (dp.circuit ? " · " + dp.circuit : "") : ""; }
+    }
+    if (d.k === "l") { const v = parseFloat(el.value), bad = !isNaN(v) && v > settings.maxLoss; el.classList.toggle("lowlight", bad); el.parentElement.classList.toggle("lowlight", bad); }
+    if (d.k === "s") { const c = SPL_COLORS[el.value]; el.parentElement.style.background = c ? c[0] : ""; el.parentElement.style.color = c ? c[1] : ""; }
+  }
+  scheduleSave(loc); return true;
+}
+
+/* ================= wire map ================= */
+function findSplice(id){
+  for (const l of locations) if (!l.deleted) { const i = (l.splices || []).findIndex(x => x.id === id); if (i >= 0) return {loc: l, sp: l.splices[i], idx: i}; }
+  return null;
+}
+function findPanel(id){
+  for (const l of locations) if (!l.deleted) { const p = l.panels.find(x => x.id === id); if (p) return {loc: l, panel: p}; }
+  return null;
+}
+const sideKey = (sp, side) => { const s = sp[side]; return s.spl ? "S:" + s.spl : s.panel ? "P:" + s.panel : "O:" + sp.id + ":" + side; };
+
+// graph of panels (P), splices (S) and loose ends (O); edges run A -> splice -> B
+function buildGraph(){
+  const nodes = new Map(), edges = [], seen = new Set();
+  const addNode = (key, n) => { if (!nodes.has(key)) nodes.set(key, {key, ...n}); return key; };
+  for (const l of locations) if (!l.deleted) for (const [idx, sp] of (l.splices || []).entries()) {
+    const sk = addNode("S:" + sp.id, {kind:"S", loc:l, sp, idx});
+    for (const side of ["a", "b"]) {
+      const s = sp[side], k = sideKey(sp, side);
+      if (k.startsWith("P:")) { const f = findPanel(s.panel); if (!f) continue; addNode(k, {kind:"P", loc:f.loc, panel:f.panel}); }
+      else if (k.startsWith("S:")) { const f = findSplice(s.spl); if (!f) continue; addNode(k, {kind:"S", loc:f.loc, sp:f.sp, idx:f.idx}); }
+      else addNode(k, {kind:"O", label: s.other || "Not set"});
+      const from = side === "a" ? k : sk, to = side === "a" ? sk : k;
+      const pair = [from, to].sort().join("|");
+      if (seen.has(pair)) continue; seen.add(pair);
+      const t = s.term ? "Term " + s.term : "";
+      edges.push({from, to, label: [s.cable, t].filter(Boolean).join(" · "), fibers: sp.fibers});
+    }
+  }
+  return {nodes, edges};
+}
+
+function layoutGraph(g, focusKeys){
+  // connected components
+  const adj = new Map([...g.nodes.keys()].map(k => [k, []]));
+  g.edges.forEach(e => { adj.get(e.from).push(e.to); adj.get(e.to).push(e.from); });
+  const comp = new Map(); let c = 0;
+  for (const k of adj.keys()) if (!comp.has(k)) {
+    const st = [k]; comp.set(k, c);
+    while (st.length) { const x = st.pop(); for (const y of adj.get(x)) if (!comp.has(y)) { comp.set(y, c); st.push(y); } }
+    c++;
+  }
+  let keep = [...g.nodes.keys()];
+  if (focusKeys) { const cs = new Set(focusKeys.filter(k => comp.has(k)).map(k => comp.get(k))); keep = keep.filter(k => cs.has(comp.get(k))); }
+  const keepSet = new Set(keep);
+  const E = g.edges.filter(e => keepSet.has(e.from) && keepSet.has(e.to));
+  // longest-path depth (left to right), guarded against loops
+  const depth = new Map(keep.map(k => [k, 0]));
+  for (let i = 0; i < keep.length; i++) { let ch = false; for (const e of E) if (depth.get(e.to) < depth.get(e.from) + 1 && depth.get(e.from) < keep.length) { depth.set(e.to, depth.get(e.from) + 1); ch = true; } if (!ch) break; }
+  const W = 210, H = 66, CG = 160, RG = 26;
+  const pos = new Map(); let y0 = 20, maxX = 0;
+  const comps = [...new Set(keep.map(k => comp.get(k)))];
+  for (const ci of comps) {
+    const ks = keep.filter(k => comp.get(k) === ci);
+    const cols = new Map();
+    ks.forEach(k => { const d = depth.get(k); if (!cols.has(d)) cols.set(d, []); cols.get(d).push(k); });
+    let rows = 0;
+    const rowOf = new Map();
+    for (const d of [...cols.keys()].sort((a, b) => a - b)) {
+      const list = cols.get(d);
+      // order each column by where its upstream neighbours sit, so lines cross less
+      const bary = k => { const ups = E.filter(e => e.to === k && rowOf.has(e.from)).map(e => rowOf.get(e.from)); return ups.length ? ups.reduce((a, b) => a + b, 0) / ups.length : 1e9; };
+      list.sort((a, b) => (bary(a) - bary(b)) || nodeTitle(g.nodes.get(a)).localeCompare(nodeTitle(g.nodes.get(b))));
+      list.forEach((k, i) => rowOf.set(k, i));
+      list.forEach((k, i) => { const x = 20 + d * (W + CG); pos.set(k, {x, y: y0 + i * (H + RG)}); maxX = Math.max(maxX, x + W); });
+      rows = Math.max(rows, list.length);
+    }
+    y0 += rows * (H + RG) + 34;
+  }
+  return {pos, edges: E, keys: keep, width: maxX + 20, height: y0, W, H};
+}
+function homeFocus(q){
+  const g = buildGraph(), keys = [];
+  for (const [k, n] of g.nodes) {
+    const txt = n.kind === "O" ? n.label : n.loc.name + " " + (n.panel ? n.panel.name + " " + n.panel.systemId : "") + (n.sp ? n.sp.name + " " + n.sp.closure + " " + n.sp.a.cable + " " + n.sp.b.cable : "");
+    if (txt.toLowerCase().includes(q)) keys.push(k);
+  }
+  return keys;
+}
+function nodeTitle(n){ return n.kind === "O" ? n.label : n.loc.name; }
+
+function wireMapSVG(focusKeys){
+  const g = buildGraph();
+  if (!g.edges.length) return `<div class="empty">No routes yet. Add a splice and set its Side A and Side B to panels (or other splices) and the wire map draws itself.</div>`;
+  const L2 = layoutGraph(g, focusKeys);
+  if (!L2.keys.length) return `<div class="empty">Nothing at this location is connected by a splice yet.</div>`;
+  const {pos, W, H} = L2;
+  const fset = new Set(focusKeys || []);
+  const edgeSVG = L2.edges.map(e => {
+    const a = pos.get(e.from), b = pos.get(e.to); if (!a || !b) return "";
+    const x1 = a.x + W, y1 = a.y + H / 2, x2 = b.x, y2 = b.y + H / 2, mx = (x1 + x2) / 2;
+    return `<path d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" fill="none" stroke="#1F2A5C" stroke-width="2.5" marker-end="url(#arr)"/>
+      ${e.label ? `<text x="${mx}" y="${(y1 + y2) / 2 - 6}" text-anchor="middle" class="wm-el">${esc(trunc(e.label, 24))}</text>` : ""}
+      <text x="${mx}" y="${(y1 + y2) / 2 + 12}" text-anchor="middle" class="wm-el2">${e.fibers || ""}F</text>`;
+  }).join("");
+  const nodeSVG = L2.keys.map(k => {
+    const n = g.nodes.get(k), p = pos.get(k), hl = fset.has(k) ? ' stroke="#00AEEF" stroke-width="4"' : "";
+    if (n.kind === "P") {
+      const st = statsOf({panels: [n.panel]});
+      const terms = n.panel.modules.map(m => m.letter + m.count + m.conn).join(" ");
+      return `<g class="wm-n" data-goto="${n.loc.id}" data-gpanel="${n.panel.id}">
+        <rect x="${p.x}" y="${p.y}" width="${W}" height="${H}" rx="8" fill="#fff" stroke="#1F2A5C" stroke-width="2"${hl}/>
+        <rect x="${p.x}" y="${p.y}" width="8" height="${H}" rx="3" fill="#1F2A5C"/>
+        <text x="${p.x + 16}" y="${p.y + 19}" class="wm-t">${esc(trunc(n.loc.name, 24))}</text>
+        <text x="${p.x + 16}" y="${p.y + 36}" class="wm-s">▦ ${esc(trunc(n.panel.name, 16))} · ${st.total} ports</text>
+        <text x="${p.x + 16}" y="${p.y + 53}" class="wm-s2">${esc(trunc(terms, 30))}${st.DAMAGED ? ` · ${st.DAMAGED} dmg` : ""}</text></g>`;
+    }
+    if (n.kind === "S") {
+      const done = n.sp.rows.filter(r => r.s === "SPLICED" || r.s === "PASS").length;
+      const lv = n.sp.rows.map(r => parseFloat(r.l)).filter(v => !isNaN(v));
+      const over = lv.filter(v => v > settings.maxLoss).length;
+      return `<g class="wm-n" data-golsp="${n.loc.id}" data-spidx="${n.idx}">
+        <rect x="${p.x}" y="${p.y}" width="${W}" height="${H}" rx="${H / 2}" fill="#E6F6FA" stroke="#007A99" stroke-width="2"${hl}/>
+        <text x="${p.x + W / 2}" y="${p.y + 19}" text-anchor="middle" class="wm-t" fill="#005F78">⇄ ${esc(trunc(n.sp.name, 22))}</text>
+        <text x="${p.x + W / 2}" y="${p.y + 36}" text-anchor="middle" class="wm-s">${esc(trunc(n.loc.name + (n.sp.closure ? " · " + n.sp.closure : ""), 30))}</text>
+        <text x="${p.x + W / 2}" y="${p.y + 53}" text-anchor="middle" class="wm-s2"${over ? ' fill="#C8102E"' : ""}>${done}/${n.sp.rows.length} spliced${over ? ` · ${over} high loss` : ""}</text></g>`;
+    }
+    return `<g><rect x="${p.x}" y="${p.y}" width="${W}" height="${H}" rx="8" fill="#F2F2F2" stroke="#999" stroke-dasharray="5 4" stroke-width="2"/>
+      <text x="${p.x + W / 2}" y="${p.y + 30}" text-anchor="middle" class="wm-t" fill="#555">${esc(trunc(n.label, 24))}</text>
+      <text x="${p.x + W / 2}" y="${p.y + 48}" text-anchor="middle" class="wm-s2">not in app</text></g>`;
+  }).join("");
+  return `<div class="wm-wrap"><svg class="wm" width="${L2.width}" height="${L2.height}" viewBox="0 0 ${L2.width} ${L2.height}">
+    <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1F2A5C"/></marker></defs>
+    ${edgeSVG}${nodeSVG}</svg></div>
+    <div class="legend" style="margin-top:8px"><span style="border:2px solid #1F2A5C;background:#fff">▦ Panel</span><span style="border:2px solid #007A99;background:#E6F6FA;border-radius:99px">⇄ Splice</span><span style="border:2px dashed #999;background:#f2f2f2">Not in app</span><span style="background:#fff;color:#555">Lines = cable (A → B). Tap a box to open it. Tap a port number on any terminal to trace that fiber.</span></div>`;
+}
+const trunc = (t, n) => { t = String(t || ""); return t.length > n ? t.slice(0, n - 1) + "…" : t; };
+
+/* ---------- single-fiber trace ---------- */
+const portNum = v => { const m = String(v || "").match(/(\d+)\s*$/); return m ? +m[1] : null; };
+function sidePort(sp, side, row){
+  const typed = portNum(side === "a" ? row.ap : row.bp);
+  if (typed) return typed;
+  const s = sp[side]; if (!s.term) return null;
+  const r = resolveSide(s), f = parseInt(side === "a" ? row.af : row.bf, 10);
+  return r.term && f && f <= r.term.count ? f : null;
+}
+// follow one fiber out of a terminal port through every splice it hits
+function traceFrom(panelId, letter, port){
+  const hops = []; const guard = new Set();
+  let cur = {kind:"T", panelId, letter, port};
+  for (let n = 0; n < 40; n++) {
+    let found = null;
+    if (cur.kind === "T") {
+      outer: for (const l of locations) if (!l.deleted) for (const [idx, sp] of (l.splices || []).entries()) for (const side of ["a", "b"]) {
+        const s = sp[side];
+        if (s.panel !== cur.panelId || (s.term && s.term !== cur.letter)) continue;
+        const ri = sp.rows.findIndex(r => sidePort(sp, side, r) === cur.port);
+        if (ri >= 0 && !guard.has(sp.id + ri)) { found = {l, idx, sp, side, ri}; break outer; }
+      }
+    } else {
+      const f = findSplice(cur.splId);
+      if (f) {
+        // the next splice is the one that points back at the splice we came from
+        outer2: for (const l of locations) if (!l.deleted) for (const [idx, sp] of (l.splices || []).entries()) for (const side of ["a", "b"]) {
+          if (sp[side].spl !== cur.fromSplId || sp.id !== cur.splId) continue;
+          const ri = sp.rows.findIndex(r => parseInt(side === "a" ? r.af : r.bf, 10) === cur.fiber);
+          if (ri >= 0 && !guard.has(sp.id + ri)) { found = {l, idx, sp, side, ri}; break outer2; }
+        }
+        if (!found) { // fall back: the splice we're entering references nothing back; match by fiber on whichever side is free
+          const sp = f.sp;
+          for (const side of ["a", "b"]) { const ri = sp.rows.findIndex(r => parseInt(side === "a" ? r.af : r.bf, 10) === cur.fiber); if (ri >= 0 && !guard.has(sp.id + ri)) { found = {l: f.loc, idx: f.idx, sp, side, ri}; break; } }
+        }
+      }
+    }
+    if (!found) break;
+    const {l, idx, sp, side, ri} = found; guard.add(sp.id + ri);
+    const row = sp.rows[ri], other = side === "a" ? "b" : "a";
+    const inF = parseInt(side === "a" ? row.af : row.bf, 10), outF = parseInt(other === "a" ? row.af : row.bf, 10);
+    hops.push({loc: l, sp, idx, row, inF, outF, inCable: sp[side].cable, outCable: sp[other].cable});
+    const o = sp[other];
+    if (o.spl) { cur = {kind:"S", splId: o.spl, fromSplId: sp.id, fiber: outF}; continue; }
+    if (o.panel) {
+      const port = sidePort(sp, other, row), fp = findPanel(o.panel);
+      hops.end = {kind:"T", loc: fp && fp.loc, panel: fp && fp.panel, letter: o.term, port, fiber: outF};
+      break;
+    }
+    hops.end = {kind:"O", label: o.other || "Not set", fiber: outF};
+    break;
+  }
+  return hops;
+}
+
+function showTrace(loc, panel, m, port){
+  const hops = traceFrom(panel.id, m.letter, port);
+  const pt = m.ports[port - 1] || {};
+  const startCkt = m.circuits[Math.floor((port - 1) / 2)] || "";
+  const box = (cls, title, lines) => `<div class="tr-box ${cls}"><b>${title}</b>${lines.filter(Boolean).map(x => `<div>${x}</div>`).join("")}</div>`;
+  const stTag = s => s ? `<span class="st-${esc(s)}" style="padding:1px 6px;border-radius:4px;font-size:10px;font-weight:800">${esc(s)}</span>` : "";
+  let html = box("tr-p", `${esc(loc.name)} › ${esc(panel.name)}`, [`Terminal ${esc(m.letter)} · port <b>${port}</b> ${fiberChip(port)}`, stTag((pt.s || "").toUpperCase()), startCkt && "Circuit " + esc(startCkt), pt.l && `${esc(pt.l)} dBm`]);
+  let loss = 0, lossN = 0;
+  for (const h of hops) {
+    const lv = parseFloat(h.row.l); if (!isNaN(lv)) { loss += lv; lossN++; }
+    html += `<div class="tr-arrow">${h.inCable ? esc(h.inCable) + "<br>" : ""}fiber ${h.inF} ${fiberChip(h.inF)}<span>→</span></div>`;
+    html += box("tr-s", `⇄ ${esc(h.sp.name)}`, [esc(h.loc.name) + (h.sp.closure ? " · " + esc(h.sp.closure) : ""), `Tray ${esc(h.row.t || "–")} · ${h.inF} → ${h.outF}`, h.row.l !== "" ? `<span class="${!isNaN(lv) && lv > settings.maxLoss ? "lowlight" : ""}">${esc(h.row.l)} dB</span>` : "", h.row.s && stTag(h.row.s), h.row.n && esc(h.row.n)]);
+  }
+  const e = hops.end;
+  if (hops.length) {
+    const last = hops[hops.length - 1];
+    html += `<div class="tr-arrow">${last.outCable ? esc(last.outCable) + "<br>" : ""}fiber ${last.outF} ${fiberChip(last.outF)}<span>→</span></div>`;
+  }
+  if (e && e.kind === "T" && e.panel) {
+    const tm = e.letter ? e.panel.modules.find(x => x.letter === e.letter) : null, ep = tm && e.port ? tm.ports[e.port - 1] || {} : {};
+    html += box("tr-p", `${esc(e.loc.name)} › ${esc(e.panel.name)}`, [tm ? `Terminal ${esc(tm.letter)} · port <b>${e.port || "?"}</b>` : "Panel (no terminal set)", stTag((ep.s || "").toUpperCase()), tm && e.port && tm.circuits[Math.floor((e.port - 1) / 2)] ? "Circuit " + esc(tm.circuits[Math.floor((e.port - 1) / 2)]) : "", ep.l && `${esc(ep.l)} dBm`]);
+  } else if (e && e.kind === "O") html += box("tr-o", esc(e.label), ["not in app"]);
+  else if (!hops.length) html += `<div class="tr-none">No splice record carries this port yet.<br>Add a splice and set one side to <b>${esc(loc.name)} › ${esc(panel.name)} › Terminal ${esc(m.letter)}</b>.</div>`;
+  else html += box("tr-o", "Route continues…", ["next splice/panel not set"]);
+  $("#trBody").innerHTML = `<div class="tr-chain">${html}</div>${hops.length ? `<p class="note" style="margin-top:12px">${hops.length} splice${hops.length === 1 ? "" : "s"} · total splice loss ${lossN ? loss.toFixed(3) + " dB" : "not recorded"}${lossN && lossN < hops.length ? ` (${lossN} of ${hops.length} recorded)` : ""}</p>` : ""}`;
+  $("#trTitle").textContent = `Fiber trace — ${panel.name} ${m.letter}-${port}`;
+  $("#dlgTrace").showModal();
+}
 
 /* ================= rendering ================= */
 function render(){
@@ -334,7 +802,13 @@ function statBar(st){
   return `<div class="bar">${STATUSES.map(s => st[s] ? `<i style="width:${st[s]/st.total*100}%;background:${ST_COLORS[s]}"></i>` : "").join("")}</div>`;
 }
 
-let homeMap = null, locMap = null;
+let homeMap = null, locMap = null, curPanelId = "";
+function navClick(e){
+  const g = e.target.closest("[data-goto]"), s2 = e.target.closest("[data-golsp]");
+  if (g) { const l = locations.find(x => x.id === g.dataset.goto); const pi2 = l ? Math.max(0, l.panels.findIndex(x => x.id === g.dataset.gpanel)) : 0; route = {...route, view:"loc", id: g.dataset.goto, sec:"panels", panel: pi2}; render(); scrollTo(0, 0); return true; }
+  if (s2) { route = {...route, view:"loc", id: s2.dataset.golsp, sec:"splices", sp: +s2.dataset.spidx}; render(); scrollTo(0, 0); return true; }
+  return false;
+}
 function killMaps(){ if (homeMap) { homeMap.remove(); homeMap = null; } if (locMap) { locMap.remove(); locMap = null; } }
 const hasGeo = l => l.lat !== "" && l.lng !== "" && !isNaN(parseFloat(l.lat)) && !isNaN(parseFloat(l.lng));
 const tiles = () => L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19, attribution:"© OpenStreetMap"});
@@ -343,11 +817,12 @@ const pinIcon = color => L.divIcon({className:"", iconSize:[22,22], iconAnchor:[
 
 function renderHome(){
   killMaps();
+  $("#app").onclick = null;
   const live = locations.filter(l => !l.deleted).sort((a,b) => a.name.localeCompare(b.name));
   const tot = {loc: live.length, panels:0, inUse:0, total:0, dmg:0, low:0, files:0};
   const rows = live.map(l => { const st = statsOf(l); tot.panels += l.panels.length; tot.inUse += st.inUse; tot.total += st.total; tot.dmg += st.DAMAGED; tot.low += st.low; tot.files += (l.attachments || []).length; return [l, st]; });
   const q = (route.q || "").toLowerCase();
-  const shown = rows.filter(([l]) => !q || (l.name + " " + l.address + " " + l.panels.map(p => p.systemId).join(" ")).toLowerCase().includes(q));
+  const shown = rows.filter(([l]) => !q || (l.name + " " + l.address + " " + l.panels.map(p => p.systemId).join(" ") + " " + (l.splices || []).map(x => x.name + " " + x.closure + " " + x.a.cable + " " + x.b.cable).join(" ")).toLowerCase().includes(q));
   const mode = route.mode || "list";
   $("#app").innerHTML = `
     <div class="tiles">
@@ -357,16 +832,16 @@ function renderHome(){
       <div class="tile red"><b>${tot.dmg}</b><span>Damaged · ${tot.low} low light</span></div>
     </div>
     <div class="row noprint" style="align-items:flex-start">
-      <div class="seg"><button data-mode="list" class="${mode === "list" ? "on" : ""}">List</button><button data-mode="map" class="${mode === "map" ? "on" : ""}">Map</button></div>
+      <div class="seg"><button data-mode="list" class="${mode === "list" ? "on" : ""}">List</button><button data-mode="map" class="${mode === "map" ? "on" : ""}">Map</button><button data-mode="wire" class="${mode === "wire" ? "on" : ""}">Wire map</button></div>
       <input class="search grow" id="q" placeholder="Search locations, addresses, system IDs…" value="${esc(route.q || "")}">
     </div>
-    ${mode === "map" ? `<div id="homeMap" class="map bigmap"></div><p class="note">${shown.filter(([l]) => hasGeo(l)).length} of ${shown.length} locations have a GPS pin. Red = has damaged ports.</p>` : `
+    ${mode === "wire" ? wireMapSVG(q ? homeFocus(q) : null) : mode === "map" ? `<div id="homeMap" class="map bigmap"></div><p class="note">${shown.filter(([l]) => hasGeo(l)).length} of ${shown.length} locations have a GPS pin. Red = has damaged ports.</p>` : `
     <div class="legend">${STATUSES.map(s => `<span class="st-${s}">${s}</span>`).join("")}<span style="background:#eee;color:#555">OPEN = no status</span></div>
     <div id="list">${shown.length ? shown.map(([l, st]) => `
       <div class="card" data-id="${l.id}">
         <div class="grow">
           <h3>${esc(l.name)}</h3>
-          <p>${esc(l.address || "No address")} · ${l.panels.length} panel${l.panels.length === 1 ? "" : "s"} · ${st.total} ports${(l.attachments || []).length ? ` · ${(l.attachments).length} file(s)` : ""}${st.DAMAGED ? ` · <span style="color:var(--red);font-weight:700">${st.DAMAGED} damaged</span>` : ""}${l.dirty ? ` · <span class="pending">not synced</span>` : ""}</p>
+          <p>${esc(l.address || "No address")} · ${l.panels.length} panel${l.panels.length === 1 ? "" : "s"} · ${st.total} ports${(l.splices || []).length ? ` · ${l.splices.length} splice${l.splices.length === 1 ? "" : "s"}` : ""}${(l.attachments || []).length ? ` · ${(l.attachments).length} file(s)` : ""}${st.DAMAGED ? ` · <span style="color:var(--red);font-weight:700">${st.DAMAGED} damaged</span>` : ""}${l.dirty ? ` · <span class="pending">not synced</span>` : ""}</p>
           ${statBar(st)}
         </div>
         <div class="util">${Math.round(st.util * 100)}%<small>in use</small></div>
@@ -375,7 +850,8 @@ function renderHome(){
   $("#q").oninput = e => { route.q = e.target.value; const pos = e.target.selectionStart; renderHome(); const el = $("#q"); el.focus(); el.setSelectionRange(pos, pos); };
   document.querySelectorAll(".seg button").forEach(b => b.onclick = () => { route.mode = b.dataset.mode; renderHome(); });
   const open = id => { route = {view:"loc", id, panel:0, q: route.q, mode: route.mode}; render(); scrollTo(0,0); };
-  if (mode === "list") $("#list").onclick = e => { const c = e.target.closest(".card"); if (c) open(c.dataset.id); };
+  if (mode === "wire") $("#app").onclick = navClick;
+  else if (mode === "list") $("#list").onclick = e => { const c = e.target.closest(".card"); if (c) open(c.dataset.id); };
   else if (window.L) {
     homeMap = L.map("homeMap").setView([32.7357, -97.1081], 12); tiles().addTo(homeMap);
     const pts = [];
@@ -389,14 +865,45 @@ function renderHome(){
   } else $("#homeMap").innerHTML = `<div class="empty">Map needs an internet connection.</div>`;
 }
 
+function panelSectionHTML(loc, p, pi){
+  if (!p) return `<div class="sect"><div class="empty">No panels at this location.<br><br><button class="btn primary" id="addPanel">+ Panel</button></div></div>`;
+  const conns = [...new Set(p.modules.map(m => m.conn))].join("/");
+  return `
+    <div class="tabs">
+      ${loc.panels.map((x, i) => `<button class="tab ${i === pi ? "on" : ""}" data-p="${i}">${esc(x.name || "Panel " + (i+1))}</button>`).join("")}
+      <button class="tab" id="addPanel">+ Panel</button>
+    </div>
+    <div class="sect">
+      <h2>Panel</h2>
+      <div class="fields">
+        <label>Panel name<input data-p="name" value="${esc(p.name)}"></label>
+        <label>System ID<input data-p="systemId" value="${esc(p.systemId)}"></label>
+        <label>Date<input type="date" data-p="date" value="${esc(p.date)}"></label>
+        <label>Tech<input data-p="tech" value="${esc(p.tech)}"></label>
+        <label>Panel model<input data-p="module" value="${esc(p.module)}"></label>
+        <label>Ports<input value="${portTotal(p)} · ${conns} · ${p.modules.length} terminal${p.modules.length === 1 ? "" : "s"}" readonly style="background:var(--light)"></label>
+        <label>DATT<input data-p="datt" value="${esc(p.datt)}"></label>
+        <label>Type<input data-p="type" value="${esc(p.type)}"></label>
+      </div>
+    </div>
+    <div id="mods">${(curPanelId = p.id, p.modules.map((m, mi) => moduleHTML(m, mi)).join(""))}</div>
+    <div class="row noprint">
+      <button class="btn primary" id="addMod">+ Terminal (port plate)</button>
+      <div class="grow"></div>
+      <button class="btn" id="dupPanel">Duplicate panel</button>
+      <button class="btn danger" id="delPanel" ${loc.panels.length <= 1 && !(loc.splices || []).length ? "disabled" : ""}>Delete panel</button>
+    </div>
+    <div class="legend" style="margin-top:12px">${TIA.map(([a, bg, fg]) => `<span style="background:${bg};color:${fg};border:1px solid #ccc">${a}</span>`).join("")}<span style="background:#fff;border:1px dashed #333">13–24 = same color + tracer</span></div>`;
+}
+
 function renderLocation(loc){
   killMaps();
   loc.attachments = loc.attachments || [];
-  const pi = Math.min(route.panel || 0, loc.panels.length - 1);
+  loc.splices = loc.splices || [];
+  const pi = Math.max(0, Math.min(route.panel || 0, loc.panels.length - 1));
   route.panel = pi;
   const p = loc.panels[pi];
   const st = statsOf(loc);
-  const conns = [...new Set(p.modules.map(m => m.conn))].join("/");
   $("#app").innerHTML = `
     <div class="row noprint" style="margin-bottom:10px">
       <button class="btn" id="back">← All locations</button>
@@ -424,36 +931,17 @@ function renderLocation(loc){
       <div id="locMap" class="map noprint"></div>
       <p class="note noprint" style="margin:8px 0 0">${loc.panels.length} panel(s) · ${st.inUse}/${st.total} ports in use · ${st.DAMAGED} damaged · ${st.low} low light (&lt; ${settings.low} dBm)</p>
     </div>
-    <div class="tabs">
-      ${loc.panels.map((x, i) => `<button class="tab ${i === pi ? "on" : ""}" data-p="${i}">${esc(x.name || "Panel " + (i+1))}</button>`).join("")}
-      <button class="tab" id="addPanel">+ Panel</button>
+    <div class="seg noprint" style="margin-bottom:12px">
+      <button data-sec="panels" class="${route.sec !== "splices" ? "on" : ""}">Panels (${loc.panels.length})</button>
+      <button data-sec="splices" class="${route.sec === "splices" ? "on" : ""}">Splices (${(loc.splices || []).length})</button>
+      <button data-sec="wire" class="${route.sec === "wire" ? "on" : ""}">Wire map</button>
     </div>
-    <div class="sect">
-      <h2>Panel</h2>
-      <div class="fields">
-        <label>Panel name<input data-p="name" value="${esc(p.name)}"></label>
-        <label>System ID<input data-p="systemId" value="${esc(p.systemId)}"></label>
-        <label>Date<input type="date" data-p="date" value="${esc(p.date)}"></label>
-        <label>Tech<input data-p="tech" value="${esc(p.tech)}"></label>
-        <label>Panel model<input data-p="module" value="${esc(p.module)}"></label>
-        <label>Ports<input value="${portTotal(p)} · ${conns} · ${p.modules.length} terminal${p.modules.length === 1 ? "" : "s"}" readonly style="background:var(--light)"></label>
-        <label>DATT<input data-p="datt" value="${esc(p.datt)}"></label>
-        <label>Type<input data-p="type" value="${esc(p.type)}"></label>
-      </div>
-    </div>
-    <div id="mods">${p.modules.map((m, mi) => moduleHTML(m, mi)).join("")}</div>
-    <div class="row noprint">
-      <button class="btn primary" id="addMod">+ Terminal (port plate)</button>
-      <div class="grow"></div>
-      <button class="btn" id="dupPanel">Duplicate panel</button>
-      <button class="btn danger" id="delPanel" ${loc.panels.length <= 1 ? "disabled" : ""}>Delete panel</button>
-    </div>
-    <div class="legend" style="margin-top:12px">${TIA.map(([a, bg, fg]) => `<span style="background:${bg};color:${fg};border:1px solid #ccc">${a}</span>`).join("")}<span style="background:#fff;border:1px dashed #333">13–24 = same color + tracer</span></div>
+    ${route.sec === "wire" ? `<div style="margin-bottom:14px">${wireMapSVG([...loc.panels.map(x => "P:" + x.id), ...loc.splices.map(x => "S:" + x.id)])}</div>` : route.sec === "splices" ? spliceSectionHTML(loc) : panelSectionHTML(loc, p, pi)}
     <div class="sect noprint" style="margin-top:14px">
       <h2>Photos, OTDR traces, GIS maps &amp; PDFs</h2>
       <div class="upl">
         <select id="upCat"><option value="auto">Type: auto-detect</option>${Object.entries(CATS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("")}</select>
-        <select id="upPanel"><option value="">Whole location</option>${loc.panels.map((x, i) => `<option value="${x.id}" ${i === pi ? "selected" : ""}>${esc(x.name)}</option>`).join("")}</select>
+        <select id="upPanel"><option value="">Whole location</option>${loc.panels.map((x, i) => `<option value="${x.id}" ${i === pi && route.sec !== "splices" ? "selected" : ""}>${esc(x.name)}</option>`).join("")}${loc.splices.map((x, i) => `<option value="${x.id}" ${route.sec === "splices" && i === route.sp ? "selected" : ""}>Splice: ${esc(x.name)}</option>`).join("")}</select>
         <label class="btn cyan" style="margin:0">📷 Take photo<input type="file" id="upCam" accept="image/*" capture="environment" hidden></label>
         <label class="btn primary" style="margin:0">⬆ Add files<input type="file" id="upFiles" multiple hidden accept="image/*,.pdf,.sor,.trc,.msor,.kml,.kmz,.csv,.txt"></label>
       </div>
@@ -472,7 +960,7 @@ function attListHTML(loc){
   const list = loc.attachments.filter(a => af === "all" || a.cat === af).sort((a, b) => (b.addedAt || "").localeCompare(a.addedAt || ""));
   if (!list.length) return `<div class="note">No files yet.</div>`;
   return list.map(a => {
-    const pn = a.panelId ? (loc.panels.find(x => x.id === a.panelId) || {}).name || "Removed panel" : "Location";
+    const pn = a.panelId ? (loc.panels.find(x => x.id === a.panelId) || (loc.splices || []).find(x => x.id === a.panelId) || {}).name || "Removed" : "Location";
     return `<div class="att">
       <div class="thumb" data-view="${a.id}" data-thumb="${a.id}">${a.type && a.type.startsWith("image/") ? "" : extOf(a.name)}</div>
       <div class="meta"><b title="${esc(a.name)}">${esc(a.name)}</b><span class="cat">${CATS[a.cat] || a.cat}</span> ${esc(pn)}<br>${fmtSize(a.size || 0)} · ${a.driveId ? "in Drive" : `<span class="pending">waiting to upload</span>`}</div>
@@ -527,7 +1015,7 @@ function moduleHTML(m, mi){
     const idx = Array.from({length:12}, (_, k) => start + k);
     const tracer = start >= 12;
     return `<div class="scroll"><table class="grid">
-      <tr><th class="lab">Port</th>${idx.map(i => { const [, bg, fg] = TIA[i % 12]; return `<th class="port" style="background:${bg};color:${fg};${tracer ? "border-bottom:4px dashed " + (fg === "#000" ? "#000" : "#fff") : ""}">${i+1}</th>`; }).join("")}</tr>
+      <tr><th class="lab">Port</th>${idx.map(i => { const [, bg, fg] = TIA[i % 12]; return `<th class="port" data-trace="${mi}:${i}" title="Trace port ${i+1}" style="background:${bg};color:${fg};${tracer ? "border-bottom:4px dashed " + (fg === "#000" ? "#000" : "#fff") : ""}">${i+1}</th>`; }).join("")}</tr>
       <tr><th class="lab">Status</th>${idx.map(i => { const pt = ports[i]; return `<td class="st-${esc((pt.s||"").toUpperCase())}"><select data-m="${mi}" data-i="${i}" data-k="s"><option value=""></option>${STATUSES.map(s => `<option ${pt.s === s ? "selected" : ""}>${s}</option>`).join("")}</select></td>`; }).join("")}</tr>
       <tr><th class="lab">Patch</th>${idx.map(i => `<td><input data-m="${mi}" data-i="${i}" data-k="p" value="${esc(ports[i].p)}"></td>`).join("")}</tr>
       <tr><th class="lab">Level (dBm)</th>${idx.map(i => `<td class="${lowCls(i)}"><input data-m="${mi}" data-i="${i}" data-k="l" value="${esc(ports[i].l)}" inputmode="decimal" class="${lowCls(i)}"></td>`).join("")}</tr>
@@ -541,6 +1029,7 @@ function moduleHTML(m, mi){
       <select data-m="${mi}" data-k="conn" class="noprint" style="border:0;border-radius:5px;margin-right:8px;padding:3px;background:#fff;color:#1b1f2e;font-weight:700">${["LC","SC"].map(c => `<option ${m.conn === c ? "selected" : ""}>${c}</option>`).join("")}</select>
       <span class="printonly" style="padding-right:8px">${m.count} ${esc(m.conn)}</span>
       <span>TO:</span><input data-m="${mi}" data-k="to" value="${esc(m.to)}" placeholder="Destination">
+      ${splicesFor(curPanelId, m.letter).map(x => `<button class="spbadge noprint" data-golsp="${x.loc.id}" data-spidx="${x.idx}" title="${esc(x.loc.name)} · side ${x.side}">⇄ ${esc(x.sp.name)} (${x.side})</button>`).join("")}
       <button class="x noprint" data-rmterm="${mi}" title="Remove terminal">✕</button></div>
     ${chunk(0)}${m.count > 12 ? `<div style="height:4px;background:var(--navy)"></div>${chunk(12)}` : ""}</div>`;
 }
@@ -553,11 +1042,16 @@ function bindLocation(loc, p){
     if (!confirm(`Delete "${loc.name}" and all its panels? This also removes its tab from the Google Sheet (files stay in Drive).`)) return;
     loc.deleted = true; await touch(loc); route = {view:"home"}; render(); toast("Location deleted");
   };
-  document.querySelectorAll(".tab[data-p]").forEach(b => b.onclick = () => { route.panel = +b.dataset.p; render(); });
-  $("#addPanel").onclick = () => openTermDialog("A", "New panel — Terminal A", async (letter, count, conn) => {
+  document.querySelectorAll("[data-sec]").forEach(b => b.onclick = () => { route.sec = b.dataset.sec; render(); });
+  $("#app").onclick = navClick;
+  if (route.sec === "splices") bindSplices(loc);
+  const addP = $("#addPanel");
+  if (addP) addP.onclick = () => openTermDialog("A", "New panel — Terminal A", async (letter, count, conn) => {
     const np = newPanel(loc.panels.length + 1, 1, count, conn); np.modules[0].letter = letter;
     loc.panels.push(np); route.panel = loc.panels.length - 1; await touch(loc); render();
   });
+  if (route.sec !== "splices" && route.sec !== "wire" && p) {
+  document.querySelectorAll(".tab[data-p]").forEach(b => b.onclick = () => { route.panel = +b.dataset.p; render(); });
   $("#dupPanel").onclick = async () => {
     const c = JSON.parse(JSON.stringify(p)); c.id = uid(); c.name = p.name + " (copy)";
     loc.panels.push(c); route.panel = loc.panels.length - 1; await touch(loc); render();
@@ -575,6 +1069,8 @@ function bindLocation(loc, p){
     }, last ? last.count : 12, last ? last.conn : "LC");
   };
   $("#mods").addEventListener("click", async e => {
+    const tr = e.target.closest("[data-trace]");
+    if (tr) { const [mi2, i2] = tr.dataset.trace.split(":").map(Number); return showTrace(loc, p, p.modules[mi2], i2 + 1); }
     const b = e.target.closest("[data-rmterm]"); if (!b) return;
     const mi = +b.dataset.rmterm, m = p.modules[mi];
     if (p.modules.length <= 1) return toast("A panel needs at least one terminal");
@@ -582,6 +1078,7 @@ function bindLocation(loc, p){
     if (!confirm(`Remove Terminal ${m.letter}${used ? " and all its port data" : ""}?`)) return;
     p.modules.splice(mi, 1); await touch(loc); render();
   });
+  }
   // attachments
   document.querySelectorAll("[data-af]").forEach(b => b.onclick = () => { route.af = b.dataset.af; render(); });
   const addFiles = async files => {
@@ -621,12 +1118,13 @@ function bindLocation(loc, p){
     const el = e.target; const d = el.dataset;
     p = loc.panels[route.panel] || p;
     if (el.type === "file" || el.id === "upCat" || el.id === "upPanel") return;
+    if (spliceInput(loc, el, e)) return;
     if (d.l !== undefined) { loc[d.l] = el.value; if ((d.l === "lat" || d.l === "lng") && e.type === "change") { render(); } }
-    else if (d.p !== undefined && el.tagName !== "BUTTON") {
+    else if (d.p !== undefined && el.tagName !== "BUTTON" && p) {
       p[d.p] = el.value;
       if (d.p === "name") { const t = document.querySelector(`.tab[data-p="${route.panel}"]`); if (t) t.textContent = el.value || "Panel"; }
     }
-    else if (d.m !== undefined) {
+    else if (d.m !== undefined && p) {
       const m = p.modules[+d.m];
       if (d.c !== undefined) m.circuits[+d.c] = el.value;
       else if (d.k === "to") m.to = el.value;
@@ -691,7 +1189,7 @@ async function sync(manual){
       if (!l && r.deleted) continue;                           // deleted elsewhere, never had it
       if (l && r.updatedAt <= l.updatedAt) continue;          // ours is same or newer
       if (l && isEditing() && route.id === l.id) continue;      // don't yank the screen mid-edit
-      const merged = {...r, attachments: [...(r.attachments || [])], dirty:false};
+      const merged = upgradeLoc({...r, attachments: [...(r.attachments || [])], dirty:false});
       if (l) {                                                 // keep files still waiting to upload here
         const pend = (l.attachments || []).filter(a => !a.driveId && !merged.attachments.some(x => x.id === a.id));
         if (pend.length) { merged.attachments.push(...pend); merged.dirty = true; merged.updatedAt = now(); }
@@ -764,12 +1262,13 @@ $("#dlgTerm").addEventListener("close", () => {
   termCb(letter, +f.get("tcount") || 12, f.get("tconn") || "LC"); termCb = null;
 });
 $("#btnSettings").onclick = () => {
-  $("#setUrl").value = settings.url; $("#setKey").value = settings.key; $("#setTech").value = settings.tech; $("#setLow").value = settings.low;
+  $("#setUrl").value = settings.url; $("#setKey").value = settings.key; $("#setTech").value = settings.tech; $("#setLow").value = settings.low; $("#setLoss").value = settings.maxLoss;
   $("#dlgSettings").showModal();
 };
 $("#btnSaveSettings").onclick = async () => {
   settings.url = $("#setUrl").value.trim(); settings.key = $("#setKey").value.trim();
   settings.tech = $("#setTech").value.trim(); settings.low = parseFloat($("#setLow").value); if (isNaN(settings.low)) settings.low = -25;
+  settings.maxLoss = parseFloat($("#setLoss").value); if (isNaN(settings.maxLoss)) settings.maxLoss = 0.15;
   await DB.setMeta("settings", settings); $("#dlgSettings").close(); render();
   if (settings.url) sync(true); else setChip("Local", "");
 };
@@ -801,7 +1300,7 @@ $("#fileImport").onchange = async e => {
 /* ================= boot ================= */
 (async function boot(){
   const s = await DB.getMeta("settings"); if (s) settings = {...settings, ...s};
-  locations = await DB.all();
+  locations = (await DB.all()).map(upgradeLoc);
   setChip(settings.url ? "Ready" : "Local", "");
   render();
   if (settings.url) sync();
