@@ -1,0 +1,14 @@
+{
+  // Cloudflare Worker config for fdoc.fiber911.com
+  // "name" MUST match the Worker's name shown at the top of its Cloudflare page.
+  "name": "fiber911-fdoc",
+  "main": "worker.js",
+  "compatibility_date": "2025-06-01",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS",
+    "run_worker_first": ["/otdr", "/otdr/"]
+  },
+  // keep the SCRIPT_URL / SYNC_KEY / UPLOAD_PIN you set in the dashboard on every deploy
+  "keep_vars": true
+}
