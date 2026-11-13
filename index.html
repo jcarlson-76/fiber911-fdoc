@@ -168,6 +168,20 @@ tr.droprow td{background:#FAF7FD}
 .side-d{border-top-color:#7B3FA0}.side-d h3{color:#7B3FA0}
 table.splice tr.sh th.sd{background:#7B3FA0}
 .fileinp{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+.cable{background:#fff;border:1px solid var(--line);border-left:6px solid #B8860B;border-radius:12px;margin-bottom:10px}
+.cable.hl{box-shadow:0 0 0 3px var(--cyan)}
+.cablehead{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.cablehead input,.cablehead select,.cend select{padding:7px 8px;border:1px solid var(--line);border-radius:7px;background:#fff}
+.cbname{font-weight:800;font-size:15px;width:230px}
+.cablehead .x{background:none;border:0;font-size:18px;color:var(--red);cursor:pointer}
+.cablebody{display:grid;grid-template-columns:1fr 40px 1fr;gap:8px;padding:10px 12px;align-items:start}
+.cablearrow{font-size:22px;color:#B8860B;font-weight:900;text-align:center;padding-top:18px}
+.cendlab{font-size:10px;font-weight:800;text-transform:uppercase;color:var(--navy);margin-bottom:4px}
+.cend{display:flex;flex-direction:column;gap:6px}
+@media(max-width:700px){.cablebody{grid-template-columns:1fr}.cablearrow{padding:0;transform:rotate(90deg)}}
+.pcable{padding:4px 0;border-bottom:1px dashed var(--line)}
+.cbbadge{background:#B8860B}
+.cablesel{font-weight:700;border-color:#B8860B!important}
 .upl select{padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
 @media print{
   @page{size:letter portrait;margin:.4in}
@@ -276,6 +290,8 @@ table.splice tr.sh th.sd{background:#7B3FA0}
     <label>Tech name (default for new panels)<input id="setTech"></label>
     <label>Low-light threshold (dBm)<input id="setLow" type="number" step="0.1"></label>
     <label>Max splice loss (dB)<input id="setLoss" type="number" step="0.01"></label>
+    <label>Cable naming pattern<input id="setPat" placeholder="{A}-{B}-{F}F"></label>
+    <span class="note" style="margin-top:-4px">{A}/{B} = end short codes (location code + P# if several panels + terminal letter), {F} = fiber count. Example: CO-MH12-144F.</span>
   </div>
   <p class="note">MaxTester upload page: <b id="setOtdrUrl"></b> (open it in the MaxTester's browser over Wi-Fi).</p>
   <p class="note">Data is saved on this device first, then synced to the shared Google Sheet. Each location becomes its own tab in the Sheet.</p>
@@ -424,7 +440,7 @@ function statsOf(loc){
 
 /* ================= state ================= */
 let locations = [];
-let settings = {url:"", key:"", tech:"", low:-25, maxLoss:0.15};
+let settings = {url:"", key:"", tech:"", low:-25, maxLoss:0.15, cablePattern:"{A}-{B}-{F}F"};
 let route = {view:"home"};
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -506,7 +522,8 @@ function sidePickerHTML(sp, key, title, cls){
   return `<div class="side ${cls || "side-" + key}">
     ${title ? `<h3>${title}</h3>` : ""}
     <div class="fields" style="grid-template-columns:1fr 1fr">
-      <label class="span2">Location<select data-sd="${key}" data-k="loc">
+      <label class="span2">🧵 Cable<select data-sd="${key}" data-k="cableId" class="cablesel">${cableOptionsHTML(s.cableId, (locations.find(l => (l.splices || []).includes(sp)) || {}).id, s.loc)}</select></label>
+      <label class="span2">${s.cableId ? "Far end (from cable)" : "Location"}<select data-sd="${key}" data-k="loc">
         <option value="">— Other / not in app —</option>
         ${locs.map(l => `<option value="${l.id}" ${s.loc === l.id ? "selected" : ""}>${esc(l.name)}</option>`).join("")}
       </select></label>
@@ -518,9 +535,9 @@ function sidePickerHTML(sp, key, title, cls){
       <label>Terminal<select data-sd="${key}" data-k="term" ${r.panel ? "" : "disabled"}><option value="">— whole panel —</option>
         ${r.panel ? r.panel.modules.map(m => `<option value="${esc(m.letter)}" ${s.term === m.letter ? "selected" : ""}>Terminal ${esc(m.letter)} · ${m.count} ${esc(m.conn)}</option>`).join("") : ""}</select></label>`
       : `<label class="span2">Describe<input data-sd="${key}" data-k="other" value="${esc(s.other)}" placeholder="e.g. CO, building MDF, signal cabinet"></label>`}
-      <label class="span2">Cable ID / count<input data-sd="${key}" data-k="cable" value="${esc(s.cable)}" placeholder="${key[0] === "d" ? "e.g. 6F drop" : "e.g. 144F-ARL-031"}"></label>
+      ${s.cableId ? "" : `<label class="span2">Cable ID (free text)<input data-sd="${key}" data-k="cable" value="${esc(s.cable)}" placeholder="${key[0] === "d" ? "e.g. 6F drop" : "e.g. 144F-ARL-031"}"></label>`}
     </div>
-    ${r.spl ? `<button class="linkbtn noprint" data-golsp="${r.loc.id}" data-spidx="${r.loc.splices.indexOf(r.spl)}">Open ⇄ ${esc(r.spl.name)} →</button>` : r.loc ? `<button class="linkbtn noprint" data-goto="${r.loc.id}" data-gpanel="${r.panel ? r.panel.id : ""}">Open ${esc(r.loc.name)} →</button>` : ""}
+    ${s.cableId ? `<button class="linkbtn noprint" data-gocable="${s.cableId}">🧵 Cable record →</button> &nbsp; ` : ""}${r.spl ? `<button class="linkbtn noprint" data-golsp="${r.loc.id}" data-spidx="${r.loc.splices.indexOf(r.spl)}">Open ⇄ ${esc(r.spl.name)} →</button>` : r.loc ? `<button class="linkbtn noprint" data-goto="${r.loc.id}" data-gpanel="${r.panel ? r.panel.id : ""}">Open ${esc(r.loc.name)} →</button>` : ""}
   </div>`;
 }
 
@@ -720,8 +737,12 @@ function bindSplices(loc){
   };
   $("#spAddDrop").onclick = async () => { sp.drops.push(newDrop(sp.drops.length + 1)); await touch(loc); render(); };
   $("#spTap").onclick = () => openTapDialog(loc, sp);
-  $("#spDup").onclick = async () => { const c = JSON.parse(JSON.stringify(sp)); c.id = uid(); c.name += " (copy)"; c.drops.forEach(d => d.id = uid()); loc.splices.push(c); route.sp = loc.splices.length - 1; await touch(loc); render(); };
-  $("#spDel").onclick = async () => { if (!confirm(`Delete ${sp.name}?`)) return; loc.splices.splice(route.sp, 1); route.sp = 0; await touch(loc); render(); };
+  $("#spDup").onclick = async () => { const c = JSON.parse(JSON.stringify(sp)); c.id = uid(); c.name += " (copy)"; c.drops.forEach(d => d.id = uid()); cableSides(c).forEach(x => x.cableId = ""); loc.splices.push(c); route.sp = loc.splices.length - 1; await touch(loc); render(); };
+  $("#spDel").onclick = async () => {
+    if (!confirm(`Delete ${sp.name}?`)) return;
+    for (const c of liveCables()) { let ch = false; c.ends.forEach((e, i) => { if (e.spl === sp.id) { c.ends[i] = blankEnd(); ch = true; } }); if (ch) await touch(c); }
+    loc.splices.splice(route.sp, 1); route.sp = 0; await touch(loc); render();
+  };
   document.querySelectorAll("[data-rmdrop]").forEach(b => b.onclick = async () => {
     const di = +b.dataset.rmdrop, dr = sp.drops[di];
     if (!confirm(`Remove ${dr.name}? Fibers marked DROP for it go back to blank.`)) return;
@@ -794,10 +815,34 @@ function spliceInput(loc, el, e){
     dr[d.k] = el.value;
   } else if (d.sd !== undefined) {
     const s = getSide(sp, d.sd); if (!s) return true;
+    if (d.k === "cableId") {
+      if (e.type !== "change") return true;
+      const v = el.value;
+      if (s.cableId && s.cableId !== v) detachSide(sp, s);
+      if (v === "__new") {
+        const fibers = d.sd[0] === "d" ? ((sp.drops[+d.sd.slice(1)] || {}).fibers || 6) : sp.fibers;
+        const here = spliceRef(loc, sp), far = farOf(s);
+        const sug = d.sd === "a" ? autoCableName(far, here, fibers) : autoCableName(here, far, fibers);
+        const name = prompt("Cable ID (auto-named, edit if needed):", sug);
+        if (!name || !name.trim()) { render(); return true; }
+        const c = newCable(name.trim(), fibers); c.autoName = name.trim() === sug; cables.push(c);
+        attachSideToCable(loc, sp, s, c);
+      } else if (v) {
+        const c = cables.find(x => x.id === v);
+        if (c && !attachSideToCable(loc, sp, s, c)) { render(); return true; }
+      }
+      (async () => { const c = cables.find(x => x.id === s.cableId); if (c) { await touch(c); await propagateCable(c); } await touch(loc); render(); })();
+      return true;
+    }
     s[d.k] = el.value;
     if (d.k === "loc") { s.panel = ""; s.term = ""; s.spl = ""; const l = locations.find(x => x.id === el.value); if (l && l.panels.length === 1 && !(l.splices || []).length) s.panel = l.panels[0].id; }
     if (d.k === "panel") { s.term = ""; s.spl = ""; if (el.value.startsWith("spl:")) { s.spl = el.value.slice(4); s.panel = ""; } }
-    if (["loc", "panel", "term"].includes(d.k)) { scheduleSave(loc); render(); return true; }
+    if (["loc", "panel", "term"].includes(d.k)) {
+      const c = s.cableId ? cableFromSide(loc, sp, s) : null;
+      scheduleSave(loc);
+      if (c) (async () => { await touch(c); await propagateCable(c); render(); })(); else render();
+      return true;
+    }
   } else if (d.dr !== undefined) {
     const dr = sp.drops[+d.dr], r = dr && dr.rows[+d.r]; if (!r) return true;
     r[d.k] = el.value;
@@ -858,6 +903,18 @@ function buildGraph(){
       else addNode(k, {kind:"O", label: s.other || dr.name});
       edges.push({from: sk, to: k, label: "⤵ " + [dr.name, s.cable].filter(Boolean).join(" · "), fibers: dr.fibers, drop: true});
     }
+  }
+  // cables not carried by any splice side: draw them panel ⟷ panel (or to the splice they end at)
+  for (const c of liveCables()) {
+    if (c.ends.some(endBlank) || cableUsers(c).length) continue;
+    const keys = c.ends.map(e => {
+      if (e.spl) { const f = findSplice(e.spl); return f ? addNode("S:" + e.spl, {kind:"S", loc:f.loc, sp:f.sp, idx:f.idx}) : null; }
+      if (e.panel) { const f = findPanel(e.panel); return f ? addNode("P:" + e.panel, {kind:"P", loc:f.loc, panel:f.panel}) : null; }
+      return null;
+    });
+    if (!keys[0] || !keys[1] || keys[0] === keys[1]) continue;
+    const pair = [...keys].sort().join("|"); if (seen.has(pair)) continue; seen.add(pair);
+    edges.push({from: keys[0], to: keys[1], label: c.name, fibers: c.fibers});
   }
   return {nodes, edges};
 }
@@ -954,7 +1011,7 @@ function wireMapSVG(focusKeys){
   return `<div class="wm-wrap"><svg class="wm" width="${L2.width}" height="${L2.height}" viewBox="0 0 ${L2.width} ${L2.height}">
     <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1F2A5C"/></marker></defs>
     ${edgeSVG}${nodeSVG}</svg></div>
-    <div class="legend" style="margin-top:8px"><span style="border:2px solid #1F2A5C;background:#fff">▦ Panel</span><span style="border:2px solid #007A99;background:#E6F6FA;border-radius:99px">⇄ Splice</span><span style="border:2px dashed #999;background:#f2f2f2">Not in app</span><span style="background:#fff;color:#555">Lines = cable (A → B). Tap a box to open it. Tap a port number on any terminal to trace that fiber.</span></div>`;
+    <div class="legend" style="margin-top:8px"><span style="border:2px solid #1F2A5C;background:#fff">▦ Panel</span><span style="border:2px solid #007A99;background:#E6F6FA;border-radius:99px">⇄ Splice</span><span style="border:2px dashed #999;background:#f2f2f2">Not in app</span><span style="background:#fff;color:#555">Lines = cables (two-way; arrows show the splice A → B order). Tap a box to open it. Tap a port number on any terminal to trace that fiber.</span></div>`;
 }
 const trunc = (t, n) => { t = String(t || ""); return t.length > n ? t.slice(0, n - 1) + "…" : t; };
 
@@ -983,6 +1040,17 @@ function traceFrom(panelId, letter, port){
     for (const [di, dr] of (sp.drops || []).entries()) if (termMatch(dr.side)) {
       const r = dr.rows.find(r => dropPort(dr, r) === port);
       if (r) { entry = {l, idx, sp, enter: "d" + di, f: r.df}; break outer; }
+    }
+  }
+  if (!entry) {
+    // no splice carries this port: a cable straight to another panel?
+    for (const c of liveCables()) {
+      const i = c.ends.findIndex(e => e.panel === panelId && (!e.term || e.term === letter)); if (i < 0) continue;
+      const far = c.ends[1 - i]; if (!far.panel) continue;
+      const fp = findPanel(far.panel), ft = fp && far.term ? fp.panel.modules.find(m => m.letter === far.term) : null;
+      hops.direct = c;
+      hops.end = {kind:"T", loc: fp && fp.loc, panel: fp && fp.panel, letter: far.term, port: ft && port <= ft.count ? port : null, fiber: port};
+      return hops;
     }
   }
   for (let n = 0; entry && n < 40; n++) {
@@ -1056,6 +1124,7 @@ function showTrace(loc, panel, m, port){
     const last = hops[hops.length - 1];
     html += `<div class="tr-arrow">${last.outCable ? esc(last.outCable) + "<br>" : ""}fiber ${last.outF} ${fiberChip(last.outF)}<span>→</span></div>`;
   }
+  if (hops.direct) html += `<div class="tr-arrow">🧵 ${esc(hops.direct.name)}<br>fiber ${port} ${fiberChip(port)}<span>→</span></div>`;
   if (e && e.kind === "T" && e.panel) {
     const tm = e.letter ? e.panel.modules.find(x => x.letter === e.letter) : null, ep = tm && e.port ? tm.ports[e.port - 1] || {} : {};
     html += box("tr-p", `${esc(e.loc.name)} › ${esc(e.panel.name)}`, [tm ? `Terminal ${esc(tm.letter)} · port <b>${e.port || "?"}</b>` : "Panel (no terminal set)", stTag((ep.s || "").toUpperCase()), tm && e.port && tm.circuits[Math.floor((e.port - 1) / 2)] ? "Circuit " + esc(tm.circuits[Math.floor((e.port - 1) / 2)]) : "", ep.l && `${esc(ep.l)} dBm`]);
@@ -1144,6 +1213,194 @@ async function deleteInbox(){
   await refreshInbox();
 }
 
+/* ================= cables: one record per physical cable, two ends, no direction ================= */
+let cables = [];
+const blankEnd = () => ({loc:"", panel:"", term:"", spl:""});
+const endBlank = e => !e || (!e.loc && !e.panel && !e.spl);
+const liveCables = () => cables.filter(c => !c.deleted);
+const stripTags = h => String(h).replace(/<[^>]*>/g, "");
+function newCable(name, fibers){
+  return {id: uid(), kind:"cable", name, fibers: +fibers || 12, type:"", notes:"", ends:[blankEnd(), blankEnd()], updatedAt: now(), dirty:true};
+}
+// short code for a location: "Central Office" -> CO, "MH-12 Vault" -> MH12V, "Fire Station 8" -> FS8 (editable per location)
+function locCode(l){
+  if (!l) return "?";
+  if (l.code) return String(l.code).toUpperCase();
+  const parts = String(l.name).split(/[\s/&,]+/).filter(Boolean);
+  const c = parts.map(w => /\d/.test(w) ? w.replace(/[^A-Za-z0-9]/g, "") : w[0]).join("").toUpperCase();
+  return (c || "LOC").slice(0, 8);
+}
+function endCode(e){
+  if (endBlank(e)) return "X";
+  const l = locations.find(x => x.id === e.loc); let c = locCode(l);
+  if (e.panel && l && l.panels.length > 1) { const p = l.panels.find(x => x.id === e.panel); if (p) c += "P" + ((p.name.match(/\d+/) || [l.panels.indexOf(p) + 1])[0]); }
+  if (e.term) c += e.term;
+  return c;
+}
+function autoCableName(e1, e2, fibers, skipId){
+  const pat = settings.cablePattern || "{A}-{B}-{F}F";
+  const base = pat.replace(/\{A\}/g, endCode(e1)).replace(/\{B\}/g, endCode(e2)).replace(/\{F\}/g, fibers || "");
+  let name = base, n = 2;
+  while (liveCables().some(c => c.id !== skipId && c.name.toLowerCase() === name.toLowerCase())) name = base + "-" + (n++);
+  return name;
+}
+const endLabel = e => endBlank(e) ? `<span class="note">open end</span>` : sideLabel({...blankSide(), ...e});
+const spliceRef = (loc, sp) => ({loc: loc.id, panel:"", term:"", spl: sp.id});
+const farOf = s => ({loc: s.loc || "", panel: s.panel || "", term: s.term || "", spl: s.spl || ""});
+const cableSides = sp => [sp.a, sp.b, ...(sp.drops || []).map(d => d.side)].filter(Boolean);
+function cableUsers(c){
+  const out = [];
+  for (const l of locations) if (!l.deleted) (l.splices || []).forEach((sp, i) => { if (cableSides(sp).some(s => s.cableId === c.id)) out.push({loc: l, sp, idx: i}); });
+  return out;
+}
+
+// link a splice side to a cable; fills the side's far end from the cable, or the cable's far end from the side
+function attachSideToCable(loc, sp, s, c){
+  let i = c.ends.findIndex(e => e.spl === sp.id);
+  if (i < 0) i = c.ends.findIndex(endBlank);
+  if (i < 0) {
+    i = c.ends.findIndex(e => e.loc === loc.id);
+    if (i < 0) {
+      if (!confirm(`${c.name} already runs ${stripTags(endLabel(c.ends[0]))} ⟷ ${stripTags(endLabel(c.ends[1]))}.\n\nMove its second end to this splice?`)) return false;
+      i = 1;
+    }
+  }
+  c.ends[i] = spliceRef(loc, sp);
+  const far = c.ends[1 - i];
+  if (!endBlank(far)) Object.assign(s, {loc: far.loc, panel: far.panel || "", term: far.term || "", spl: far.spl || "", other: ""});
+  else if (!endBlank(farOf(s))) c.ends[1 - i] = farOf(s);
+  s.cableId = c.id; s.cable = c.name;
+  if (!c.fibers && sp.fibers) c.fibers = sp.fibers;
+  return true;
+}
+function detachSide(sp, s){
+  const c = cables.find(x => x.id === s.cableId);
+  if (c) { const i = c.ends.findIndex(e => e.spl === sp.id); if (i >= 0) { c.ends[i] = blankEnd(); touch(c); } }
+  s.cableId = "";
+}
+// a splice side's far end changed: move the cable's far end with it
+function cableFromSide(loc, sp, s){
+  const c = cables.find(x => x.id === s.cableId); if (!c) return null;
+  let i = c.ends.findIndex(e => e.spl === sp.id); if (i < 0) i = 0;
+  c.ends[i] = spliceRef(loc, sp); c.ends[1 - i] = farOf(s);
+  return c;
+}
+// push a cable's ends/name out to every splice side that uses it (this is what makes both directions agree)
+async function propagateCable(c){
+  if (c.autoName) { const n = autoCableName(c.ends[0], c.ends[1], c.fibers, c.id); if (n !== c.name) { c.name = n; await touch(c); } }
+  for (let i = 0; i < 2; i++) {
+    const e = c.ends[i]; if (!e || !e.spl) continue;
+    const f = findSplice(e.spl); if (!f) continue;
+    const s = cableSides(f.sp).find(x => x.cableId === c.id); if (!s) continue;
+    const far = c.ends[1 - i];
+    const before = JSON.stringify([s.loc, s.panel, s.term, s.spl, s.cable]);
+    Object.assign(s, {loc: far.loc || "", panel: far.panel || "", term: far.term || "", spl: far.spl || "", cable: c.name});
+    if (s.loc) s.other = "";
+    if (JSON.stringify([s.loc, s.panel, s.term, s.spl, s.cable]) !== before) await touch(f.loc);
+  }
+}
+function cableOptionsHTML(selId, hereLocId, farLocId){
+  const list = liveCables().slice().sort((a, b) => a.name.localeCompare(b.name));
+  const near = list.filter(c => c.ends.some(e => e.loc === hereLocId || (farLocId && e.loc === farLocId)) || c.ends.some(endBlank));
+  const rest = list.filter(c => !near.includes(c));
+  const opt = c => `<option value="${c.id}" ${c.id === selId ? "selected" : ""}>${esc(c.name)} · ${c.fibers}F — ${esc(trunc(stripTags(endLabel(c.ends[0])), 22))} ⟷ ${esc(trunc(stripTags(endLabel(c.ends[1])), 22))}</option>`;
+  return `<option value="">— not linked (type below) —</option><option value="__new">＋ New cable (auto-named)…</option>
+    ${near.length ? `<optgroup label="Here, nearby or open-ended">${near.map(opt).join("")}</optgroup>` : ""}
+    ${rest.length ? `<optgroup label="All other cables">${rest.map(opt).join("")}</optgroup>` : ""}`;
+}
+
+/* ---------- cables screen ---------- */
+function endPickerHTML(c, i){
+  const e = c.ends[i], r = resolveSide({...blankSide(), ...e});
+  const locs = locations.filter(l => !l.deleted).sort((a, b) => a.name.localeCompare(b.name));
+  return `<div class="cend">
+    <select data-ce="${c.id}:${i}" data-k="loc"><option value="">— open end —</option>${locs.map(l => `<option value="${l.id}" ${e.loc === l.id ? "selected" : ""}>${esc(l.name)}</option>`).join("")}</select>
+    ${r.loc ? `<select data-ce="${c.id}:${i}" data-k="panel"><option value="">— choose —</option>
+      ${r.loc.panels.length ? `<optgroup label="Panels">${r.loc.panels.map(p => `<option value="${p.id}" ${e.panel === p.id ? "selected" : ""}>${esc(p.name)}</option>`).join("")}</optgroup>` : ""}
+      ${(r.loc.splices || []).length ? `<optgroup label="Splices">${r.loc.splices.map(x => `<option value="spl:${x.id}" ${e.spl === x.id ? "selected" : ""}>⇄ ${esc(x.name)}</option>`).join("")}</optgroup>` : ""}</select>` : ""}
+    ${r.panel ? `<select data-ce="${c.id}:${i}" data-k="term"><option value="">— whole panel —</option>${r.panel.modules.map(m => `<option value="${esc(m.letter)}" ${e.term === m.letter ? "selected" : ""}>Term ${esc(m.letter)} · ${m.count} ${esc(m.conn)}</option>`).join("")}</select>` : ""}
+  </div>`;
+}
+function cablesViewHTML(q){
+  const list = liveCables().filter(c => !q || (c.name + " " + c.type + " " + c.notes + " " + stripTags(endLabel(c.ends[0])) + " " + stripTags(endLabel(c.ends[1]))).toLowerCase().includes(q))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  return `<div class="row noprint" style="margin-bottom:10px">
+      <button class="btn primary" id="cbNew">＋ New cable</button>
+      <span class="note">Naming pattern <b>${esc(settings.cablePattern || "{A}-{B}-{F}F")}</b> (change in ⚙). A/B = location short codes (+ panel / terminal).</span>
+    </div>
+    ${list.length ? list.map(c => {
+      const users = cableUsers(c);
+      return `<div class="cable ${route.hl === c.id ? "hl" : ""}" id="cb-${c.id}">
+        <div class="cablehead">
+          <b>🧵</b><input data-cb="${c.id}" data-k="name" value="${esc(c.name)}" class="cbname">
+          <button class="btn" data-cbauto="${c.id}" title="Rename from its ends using the pattern">Auto-name</button>
+          <select data-cb="${c.id}" data-k="fibers">${[...new Set([2,4,6,8,12,24,36,48,72,96,144,216,288,432, +c.fibers])].sort((a, b) => a - b).map(n => `<option value="${n}" ${+c.fibers === n ? "selected" : ""}>${n}F</option>`).join("")}</select>
+          <input data-cb="${c.id}" data-k="type" value="${esc(c.type)}" placeholder="type (loose tube, ribbon…)" style="width:170px">
+          <div class="grow"></div>
+          <button class="x" data-cbdel="${c.id}" title="Delete cable">✕</button>
+        </div>
+        <div class="cablebody">
+          <div><div class="cendlab">End 1</div>${endPickerHTML(c, 0)}</div>
+          <div class="cablearrow">⟷</div>
+          <div><div class="cendlab">End 2</div>${endPickerHTML(c, 1)}</div>
+        </div>
+        <div class="note" style="padding:0 12px 10px">${users.length ? "Used in: " + users.map(u => `<button class="linkbtn" data-golsp="${u.loc.id}" data-spidx="${u.idx}">⇄ ${esc(u.sp.name)} (${esc(u.loc.name)})</button>`).join(" · ") : "Not linked to a splice yet. Pick it on a splice side, or it runs directly panel ⟷ panel."}
+          <input data-cb="${c.id}" data-k="notes" value="${esc(c.notes)}" placeholder="notes" style="display:block;width:100%;margin-top:6px;padding:6px;border:1px solid var(--line);border-radius:6px"></div>
+      </div>`;
+    }).join("") : `<div class="empty">No cables yet.<br>Add one here, from a panel (＋ Cable from this panel), or with “＋ New cable” on any splice side.</div>`}`;
+}
+function bindCables(){
+  $("#cbNew").onclick = async () => {
+    const c = newCable(autoCableName(blankEnd(), blankEnd(), 12), 12); c.autoName = true; cables.push(c); await touch(c);
+    route.hl = c.id; render(); setTimeout(() => { const el = document.getElementById("cb-" + c.id); if (el) el.scrollIntoView({block:"center"}); }, 50);
+  };
+  document.querySelectorAll("[data-cbdel]").forEach(b => b.onclick = async () => {
+    const c = cables.find(x => x.id === b.dataset.cbdel); if (!c) return;
+    const users = cableUsers(c);
+    if (!confirm(`Delete cable ${c.name}?${users.length ? `\nIt's linked on ${users.length} splice(s); those sides keep the name as plain text.` : ""}`)) return;
+    for (const u of users) { cableSides(u.sp).forEach(s => { if (s.cableId === c.id) s.cableId = ""; }); await touch(u.loc); }
+    c.deleted = true; await touch(c); render();
+  });
+  document.querySelectorAll("[data-cbauto]").forEach(b => b.onclick = async () => {
+    const c = cables.find(x => x.id === b.dataset.cbauto); if (!c) return;
+    c.name = autoCableName(c.ends[0], c.ends[1], c.fibers, c.id); c.autoName = true; await touch(c); await propagateCable(c); render();
+  });
+  const h = async e => {
+    const el = e.target, d = el.dataset;
+    if (d.cb) {
+      const c = cables.find(x => x.id === d.cb); if (!c) return;
+      c[d.k] = d.k === "fibers" ? +el.value : el.value;
+      if (d.k === "name") c.autoName = false;
+      if (e.type === "change") { await touch(c); if (d.k === "name" || d.k === "fibers") { await propagateCable(c); if (d.k === "fibers" && c.autoName) render(); } }
+      return;
+    }
+    if (d.ce && e.type === "change") {
+      const [id, i] = d.ce.split(":"); const c = cables.find(x => x.id === id); if (!c) return;
+      const end = c.ends[+i];
+      const oldSpl = end.spl;
+      if (d.k === "loc") {
+        Object.assign(end, {loc: el.value, panel:"", term:"", spl:""});
+        const l = locations.find(x => x.id === el.value);
+        if (l && l.panels.length === 1 && !(l.splices || []).length) { end.panel = l.panels[0].id; if (l.panels[0].modules.length === 1) end.term = l.panels[0].modules[0].letter; }
+      }
+      if (d.k === "panel") { end.term = ""; if (el.value.startsWith("spl:")) { end.spl = el.value.slice(4); end.panel = ""; } else { end.panel = el.value; end.spl = ""; } }
+      if (d.k === "term") end.term = el.value;
+      // an end moved off a splice: unlink that splice side
+      if (oldSpl && oldSpl !== end.spl) { const f = findSplice(oldSpl); if (f) { cableSides(f.sp).forEach(s => { if (s.cableId === c.id) s.cableId = ""; }); await touch(f.loc); } }
+      // an end moved onto a splice: link the first free side (or A) so the splice knows about it
+      if (end.spl && end.spl !== oldSpl) {
+        const f = findSplice(end.spl);
+        if (f && !cableSides(f.sp).some(s => s.cableId === c.id)) {
+          const s = [f.sp.a, f.sp.b].find(x => !x.cableId && endBlank(farOf(x))) || [f.sp.a, f.sp.b].find(x => !x.cableId);
+          if (s) { s.cableId = c.id; s.cable = c.name; await touch(f.loc); }
+        }
+      }
+      await touch(c); await propagateCable(c); render();
+    }
+  };
+  $("#app").oninput = h; $("#app").onchange = h;
+}
+
 /* ================= rendering ================= */
 function render(){
   $("#fab").style.display = route.view === "home" ? "" : "none";
@@ -1164,6 +1421,8 @@ function navClick(e){
   const g = e.target.closest("[data-goto]"), s2 = e.target.closest("[data-golsp]");
   if (g) { const l = locations.find(x => x.id === g.dataset.goto); const pi2 = l ? Math.max(0, l.panels.findIndex(x => x.id === g.dataset.gpanel)) : 0; route = {...route, view:"loc", id: g.dataset.goto, sec:"panels", panel: pi2}; render(); scrollTo(0, 0); return true; }
   if (s2) { route = {...route, view:"loc", id: s2.dataset.golsp, sec:"splices", sp: +s2.dataset.spidx}; render(); scrollTo(0, 0); return true; }
+  const cb = e.target.closest("[data-gocable]");
+  if (cb) { route = {view:"home", mode:"cables", hl: cb.dataset.gocable}; render(); setTimeout(() => { const el = document.getElementById("cb-" + cb.dataset.gocable); if (el) el.scrollIntoView({block:"center"}); }, 50); return true; }
   return false;
 }
 function killMaps(){ if (homeMap) { homeMap.remove(); homeMap = null; } if (locMap) { locMap.remove(); locMap = null; } if (typeof spMap !== "undefined" && spMap) { spMap.remove(); spMap = null; } }
@@ -1189,10 +1448,10 @@ function renderHome(){
       <div class="tile red"><b>${tot.dmg}</b><span>Damaged · ${tot.low} low light</span></div>
     </div>
     <div class="row noprint" style="align-items:flex-start">
-      <div class="seg"><button data-mode="list" class="${mode === "list" ? "on" : ""}">List</button><button data-mode="map" class="${mode === "map" ? "on" : ""}">Map</button><button data-mode="wire" class="${mode === "wire" ? "on" : ""}">Wire map</button></div>
+      <div class="seg"><button data-mode="list" class="${mode === "list" ? "on" : ""}">List</button><button data-mode="map" class="${mode === "map" ? "on" : ""}">Map</button><button data-mode="wire" class="${mode === "wire" ? "on" : ""}">Wire map</button><button data-mode="cables" class="${mode === "cables" ? "on" : ""}">Cables</button></div>
       <input class="search grow" id="q" placeholder="Search locations, addresses, system IDs…" value="${esc(route.q || "")}">
     </div>
-    ${mode === "wire" ? wireMapSVG(q ? homeFocus(q) : null) : mode === "map" ? `<div id="homeMap" class="map bigmap"></div><p class="note">${shown.filter(([l]) => hasGeo(l)).length} of ${shown.length} locations have a GPS pin. Circle = location (red = damaged ports) · teal diamond = splice case.</p>` : `
+    ${mode === "cables" ? cablesViewHTML(q) : mode === "wire" ? wireMapSVG(q ? homeFocus(q) : null) : mode === "map" ? `<div id="homeMap" class="map bigmap"></div><p class="note">${shown.filter(([l]) => hasGeo(l)).length} of ${shown.length} locations have a GPS pin. Circle = location (red = damaged ports) · teal diamond = splice case.</p>` : `
     <div class="legend">${STATUSES.map(s => `<span class="st-${s}">${s}</span>`).join("")}<span style="background:#eee;color:#555">OPEN = no status</span></div>
     <div id="list">${shown.length ? shown.map(([l, st]) => `
       <div class="card" data-id="${l.id}">
@@ -1207,7 +1466,7 @@ function renderHome(){
   $("#q").oninput = e => { route.q = e.target.value; const pos = e.target.selectionStart; renderHome(); const el = $("#q"); el.focus(); el.setSelectionRange(pos, pos); };
   document.querySelectorAll(".seg button").forEach(b => b.onclick = () => { route.mode = b.dataset.mode; renderHome(); });
   const open = id => { route = {view:"loc", id, panel:0, q: route.q, mode: route.mode}; render(); scrollTo(0,0); };
-  if (mode === "wire") $("#app").onclick = e => { navClick(e); };
+  if (mode === "wire" || mode === "cables") { $("#app").onclick = e => { navClick(e); }; if (mode === "cables") bindCables(); }
   else if (mode === "list") $("#list").onclick = e => { const c = e.target.closest(".card"); if (c) open(c.dataset.id); };
   else if (window.L) {
     homeMap = L.map("homeMap").setView([32.7357, -97.1081], 12); tiles().addTo(homeMap);
@@ -1226,6 +1485,18 @@ function renderHome(){
     if (pts.length) homeMap.fitBounds(pts, {padding:[40,40], maxZoom:16});
     $("#homeMap").addEventListener("click", e => { const a = e.target.closest("[data-open]"); if (a) { e.preventDefault(); open(a.dataset.open); } const b = e.target.closest("[data-golsp]"); if (b) { e.preventDefault(); navClick(e); } });
   } else $("#homeMap").innerHTML = `<div class="empty">Map needs an internet connection.</div>`;
+}
+
+function panelCablesHTML(loc, p){
+  const list = liveCables().filter(c => c.ends.some(e => e.panel === p.id));
+  const row = c => {
+    const i = c.ends.findIndex(e => e.panel === p.id), here = c.ends[i], far = c.ends[1 - i], fr = resolveSide({...blankSide(), ...far});
+    const go = fr.spl ? `data-golsp="${fr.loc.id}" data-spidx="${fr.loc.splices.indexOf(fr.spl)}"` : fr.panel ? `data-goto="${fr.loc.id}" data-gpanel="${fr.panel.id}"` : `data-gocable="${c.id}"`;
+    return `<div class="pcable"><button class="linkbtn" data-gocable="${c.id}">🧵 ${esc(c.name)}</button> <span class="note">${c.fibers}F${here.term ? " · Term " + esc(here.term) : ""} ⟷</span> <button class="linkbtn" ${go}>${stripTags(endLabel(far))}</button></div>`;
+  };
+  return `<div class="sect noprint"><h2>Cables at this panel (${list.length})</h2>
+    ${list.map(row).join("") || `<div class="note">None yet. Cables show here whichever end they were entered from.</div>`}
+    <div class="row" style="margin-top:8px"><button class="btn" id="pcNew">＋ Cable from this panel</button></div></div>`;
 }
 
 function panelSectionHTML(loc, p, pi){
@@ -1249,6 +1520,7 @@ function panelSectionHTML(loc, p, pi){
         <label>Type<input data-p="type" value="${esc(p.type)}"></label>
       </div>
     </div>
+    ${panelCablesHTML(loc, p)}
     <div id="mods">${(curPanelId = p.id, p.modules.map((m, mi) => moduleHTML(m, mi)).join(""))}</div>
     <div class="row noprint">
       <button class="btn primary" id="addMod">+ Terminal (port plate)</button>
@@ -1284,7 +1556,8 @@ function renderLocation(loc){
         <label class="span2">Address<input data-l="address" value="${esc(loc.address)}"></label>
         <label>Latitude<input data-l="lat" value="${esc(loc.lat)}" inputmode="decimal" placeholder="32.7357"></label>
         <label>Longitude<input data-l="lng" value="${esc(loc.lng)}" inputmode="decimal" placeholder="-97.1081"></label>
-        <label class="span2 noprint">Notes<input data-l="notes" value="${esc(loc.notes)}"></label>
+        <label class="noprint">Short code<input data-l="code" value="${esc(loc.code || "")}" placeholder="${esc(locCode({name: loc.name}))}" maxlength="10" style="text-transform:uppercase"></label>
+        <label class="noprint">Notes<input data-l="notes" value="${esc(loc.notes)}"></label>
       </div>
       <div class="row noprint" style="margin:10px 0 8px">
         <button class="btn" id="gps">📍 Use my GPS</button>
@@ -1406,6 +1679,7 @@ function moduleHTML(m, mi){
       <select data-m="${mi}" data-k="conn" class="noprint" style="border:0;border-radius:5px;margin-right:8px;padding:3px;background:#fff;color:#1b1f2e;font-weight:700">${["LC","SC"].map(c => `<option ${m.conn === c ? "selected" : ""}>${c}</option>`).join("")}</select>
       <span class="printonly" style="padding-right:8px">${m.count} ${esc(m.conn)}</span>
       <span>TO:</span><input data-m="${mi}" data-k="to" value="${esc(m.to)}" placeholder="Destination">
+      ${liveCables().filter(c => c.ends.some(e => e.panel === curPanelId && e.term === m.letter)).map(c => `<button class="spbadge cbbadge noprint" data-gocable="${c.id}">🧵 ${esc(c.name)}</button>`).join("")}
       ${splicesFor(curPanelId, m.letter).map(x => `<button class="spbadge noprint" data-golsp="${x.loc.id}" data-spidx="${x.idx}" title="${esc(x.loc.name)} · side ${x.side}">⇄ ${esc(x.sp.name)} (${x.side})</button>`).join("")}
       <button class="x noprint" data-rmterm="${mi}" title="Remove terminal">✕</button></div>
     ${chunk(0)}${m.count > 12 ? `<div style="height:4px;background:var(--navy)"></div>${chunk(12)}` : ""}</div>`;
@@ -1429,6 +1703,17 @@ function bindLocation(loc, p){
   });
   if (route.sec !== "splices" && route.sec !== "wire" && p) {
   document.querySelectorAll(".tab[data-p]").forEach(b => b.onclick = () => { route.panel = +b.dataset.p; render(); });
+  const pcNew = $("#pcNew");
+  if (pcNew) pcNew.onclick = async () => {
+    const term = p.modules.length === 1 ? p.modules[0].letter : "";
+    const end = {loc: loc.id, panel: p.id, term, spl:""}, fibers = term ? p.modules[0].count : portTotal(p);
+    const sug = autoCableName(end, blankEnd(), fibers);
+    const name = prompt("Cable ID (auto-named; it renames itself once the far end is set, unless you change it):", sug);
+    if (!name || !name.trim()) return;
+    const c = newCable(name.trim(), fibers); c.ends[0] = end; c.autoName = name.trim() === sug; cables.push(c); await touch(c);
+    route = {view:"home", mode:"cables", hl: c.id}; render();
+    setTimeout(() => { const el = document.getElementById("cb-" + c.id); if (el) el.scrollIntoView({block:"center"}); }, 50);
+  };
   $("#dupPanel").onclick = async () => {
     const c = JSON.parse(JSON.stringify(p)); c.id = uid(); c.name = p.name + " (copy)";
     loc.panels.push(c); route.panel = loc.panels.length - 1; await touch(loc); render();
@@ -1564,6 +1849,14 @@ async function sync(manual){
     let pulled = 0, pushed = 0;
     // pull newer remote
     for (const r of remote) {
+      if (r.kind === "cable") {
+        const c = cables.find(x => x.id === r.id);
+        if (!c && r.deleted) continue;
+        if (c && r.updatedAt <= c.updatedAt) continue;
+        const m = {...r, ends: (r.ends || [blankEnd(), blankEnd()]).map(e => ({...blankEnd(), ...(e || {})})), dirty:false};
+        if (c) { for (const k of Object.keys(c)) delete c[k]; Object.assign(c, m); await DB.put(c); } else { cables.push(m); await DB.put(m); }
+        pulled++; continue;
+      }
       const l = locations.find(x => x.id === r.id);
       if (!l && r.deleted) continue;                           // deleted elsewhere, never had it
       if (l && r.updatedAt <= l.updatedAt) continue;          // ours is same or newer
@@ -1579,6 +1872,13 @@ async function sync(manual){
       pulled++;
     }
     // push dirty local
+    for (const c of cables.filter(x => x.dirty)) {
+      const r = rmap.get(c.id);
+      if (r && r.updatedAt > c.updatedAt) continue;
+      if (c.deleted && !r) { await DB.del(c.id); cables = cables.filter(x => x !== c); continue; }
+      await api("upsert", {location: clean(c)});
+      c.dirty = false; await DB.put(c); pushed++;
+    }
     for (const l of locations.filter(x => x.dirty)) {
       const r = rmap.get(l.id);
       if (r && r.updatedAt > l.updatedAt) continue;
@@ -1603,6 +1903,8 @@ async function sync(manual){
     // purge synced tombstones
     for (const l of locations.filter(x => x.deleted && !x.dirty)) { await DB.del(l.id); }
     locations = locations.filter(x => !(x.deleted && !x.dirty));
+    for (const c of cables.filter(x => x.deleted && !x.dirty)) { await DB.del(c.id); }
+    cables = cables.filter(x => !(x.deleted && !x.dirty));
     await DB.setMeta("lastSync", now());
     setChip("Synced", "ok");
     api("inboxList").then(j => { inboxFiles = j.files || []; updateInboxBadge(); }).catch(() => {});
@@ -1652,13 +1954,14 @@ $("#ibFolder").onclick = () => { const u = $("#ibFolder").dataset.url; if (u) wi
 $("#ibLoc").onchange = () => { $("#ibTarget").innerHTML = inboxTargetsHTML(locations.find(l => l.id === $("#ibLoc").value)); };
 $("#ibUrl").textContent = location.origin + "/otdr"; $("#setOtdrUrl").textContent = location.origin + "/otdr";
 $("#btnSettings").onclick = () => {
-  $("#setUrl").value = settings.url; $("#setKey").value = settings.key; $("#setTech").value = settings.tech; $("#setLow").value = settings.low; $("#setLoss").value = settings.maxLoss;
+  $("#setUrl").value = settings.url; $("#setKey").value = settings.key; $("#setTech").value = settings.tech; $("#setLow").value = settings.low; $("#setLoss").value = settings.maxLoss; $("#setPat").value = settings.cablePattern || "{A}-{B}-{F}F";
   $("#dlgSettings").showModal();
 };
 $("#btnSaveSettings").onclick = async () => {
   settings.url = $("#setUrl").value.trim(); settings.key = $("#setKey").value.trim();
   settings.tech = $("#setTech").value.trim(); settings.low = parseFloat($("#setLow").value); if (isNaN(settings.low)) settings.low = -25;
   settings.maxLoss = parseFloat($("#setLoss").value); if (isNaN(settings.maxLoss)) settings.maxLoss = 0.15;
+  settings.cablePattern = $("#setPat").value.trim() || "{A}-{B}-{F}F";
   await DB.setMeta("settings", settings); $("#dlgSettings").close(); render();
   if (settings.url) sync(true); else setChip("Local", "");
 };
@@ -1668,7 +1971,7 @@ $("#btnOpenSheet").onclick = async () => {
   try { const j = await api("info"); window.open(j.sheetUrl, "_blank"); } catch (e) { toast("Error: " + e.message); }
 };
 $("#btnExport").onclick = () => {
-  const blob = new Blob([JSON.stringify({exported: now(), locations: locations.filter(l => !l.deleted).map(clean)}, null, 1)], {type:"application/json"});
+  const blob = new Blob([JSON.stringify({exported: now(), locations: locations.filter(l => !l.deleted).map(clean), cables: liveCables().map(clean)}, null, 1)], {type:"application/json"});
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = `panel-guide-backup-${now().slice(0,10)}.json`; a.click();
 };
 $("#fileImport").onchange = async e => {
@@ -1682,7 +1985,14 @@ $("#fileImport").onchange = async e => {
       if (l) Object.assign(l, rec); else locations.push(rec);
       await DB.put(rec); n++;
     }
-    toast(`Restored ${n} location(s)`); render(); scheduleSync(500);
+    for (const r of data.cables || []) {
+      const c = cables.find(x => x.id === r.id);
+      if (c && c.updatedAt >= r.updatedAt) continue;
+      const rec = {...r, kind:"cable", dirty:true};
+      if (c) Object.assign(c, rec); else cables.push(rec);
+      await DB.put(rec); n++;
+    }
+    toast(`Restored ${n} record(s)`); render(); scheduleSync(500);
   } catch (err) { toast("Not a valid backup file"); }
   e.target.value = "";
 };
@@ -1690,7 +2000,9 @@ $("#fileImport").onchange = async e => {
 /* ================= boot ================= */
 (async function boot(){
   const s = await DB.getMeta("settings"); if (s) settings = {...settings, ...s};
-  locations = (await DB.all()).map(upgradeLoc);
+  const recs = await DB.all();
+  cables = recs.filter(r => r.kind === "cable");
+  locations = recs.filter(r => r.kind !== "cable").map(upgradeLoc);
   setChip(settings.url ? "Ready" : "Local", "");
   render();
   if (settings.url) sync();
